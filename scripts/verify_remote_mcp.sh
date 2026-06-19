@@ -3,9 +3,11 @@
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
-source /mnt/blockstorage/env/load.sh global 2>/dev/null || true
+source /mnt/blockstorage/env/load.sh kb-gateway 2>/dev/null || source /mnt/blockstorage/env/load.sh global 2>/dev/null || true
 
-URL="${KB_GATEWAY_PUBLIC_URL:-https://kb-mcp.waytie.com/mcp}"
+BASE="${KB_GATEWAY_PUBLIC_URL:-https://kb-mcp.waytie.com}"
+BASE="${BASE%/}"
+URL="${BASE}/mcp"
 PY="${PY:-/root/.venv-langchain-course/bin/python}"
 KEYS="${KB_GATEWAY_API_KEYS_PATH:-/mnt/blockstorage/private/credentials/learning-kb-api-keys.txt}"
 
@@ -34,7 +36,16 @@ for line in lines:
 TOKEN="${KB_GATEWAY_API_TOKEN:-$TOKEN}"
 
 echo "== remote MCP (no auth) =="
-code_noauth=$(curl -s -o /dev/null -w "%{http_code}" "$URL" || true)
+host="${URL#https://}"
+host="${host%%/*}"
+_resolve=()
+if ! getent hosts "$host" >/dev/null 2>&1; then
+  ip="$(dig +short "$host" @8.8.8.8 | head -1)"
+  if [[ -n "$ip" ]]; then
+    _resolve=(--resolve "${host}:443:${ip}")
+  fi
+fi
+code_noauth=$(curl -s -o /dev/null -w "%{http_code}" --max-time 15 "${_resolve[@]}" "$URL" || true)
 echo "HTTP $code_noauth (expect 401)"
 [[ "$code_noauth" == "401" ]] || { echo "FAIL: expected 401 without token"; exit 1; }
 
@@ -43,6 +54,7 @@ if [[ -z "$TOKEN" ]]; then
 else
   echo "== remote MCP (bearer) =="
   code_auth=$(curl -s -o /dev/null -w "%{http_code}" --max-time 15 \
+    "${_resolve[@]}" \
     -H "Authorization: Bearer $TOKEN" \
     -H "Accept: application/json, text/event-stream" \
     "$URL" || true)
