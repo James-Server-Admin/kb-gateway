@@ -11,7 +11,7 @@ Remote agents (Cursor cloud, Paperclip, Cole laptop, GitHub Actions self-hosted)
   Tailscale or Cloudflare Tunnel + Access
         │
         ▼
-  kb-gateway (streamable-http on 127.0.0.1:8790)
+  kb-gateway (streamable-http on Tailscale IP :8790)
         │
         ├── langchain-course runtime (router + RAG)
         ├── Pinecone `learning` (cloud, keys server-side only)
@@ -44,12 +44,12 @@ Never give remote agents Pinecone or Neo4j credentials — they use MCP tools on
 
 | Method | When | Notes |
 |---|---|---|
-| **jamess-mac-mini (Tailscale Serve)** | **Recommended** for Cole + Mac | Mac proxies server gateway: `tailscale serve --bg http://100.122.28.113:8790`. Clients use `http://jamess-mac-mini:8790/mcp`. See [`mac-mini-proxy.md`](mac-mini-proxy.md). |
-| **SSH stdio from Mac** | Works without HTTP | Cursor on jamess-mac-mini SSHs to server — see [`client-setup.md`](client-setup.md). |
-| **Cloudflare Tunnel** | Public HTTPS with Access policy | Zero trust; no open ports |
-| **SSH tunnel** | Dev / emergency | `ssh -L 8790:127.0.0.1:8790 server` |
+| **Tailscale IP (direct)** | **Default — already running** | Gateway on server at `100.122.28.113:8790`. Bearer token required. Anyone on tailnet. |
+| **Tailscale Serve (HTTPS)** | Optional polish | Enable on tailnet; `sudo tailscale serve --bg http://127.0.0.1:8790` if you want HTTPS + MagicDNS |
+| **SSH stdio** | Local Cursor → server | No HTTP; see [`client-setup.md`](client-setup.md) |
+| **Cloudflare Tunnel** | Public HTTPS with Access | Zero trust; no open ports |
 
-Gateway binds **127.0.0.1:8790** on the blockstorage server only — not exposed on the server's Tailscale IP.
+Gateway binds the server's **Tailscale IP** (`KB_GATEWAY_HOST=100.122.28.113`) — reachable only on your tailnet, not the public internet.
 
 ## 4. Auth
 
