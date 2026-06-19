@@ -47,3 +47,50 @@ def api_tokens() -> frozenset[str]:
 
 def public_url() -> str:
     return os.environ.get("KB_GATEWAY_PUBLIC_URL", f"http://{gateway_host()}:{gateway_port()}")
+
+
+def audit_log_path() -> Path:
+    return Path(
+        os.environ.get(
+            "KB_GATEWAY_AUDIT_LOG",
+            "/mnt/blockstorage/business/Keyflo_AI/08_Development/kb-gateway/logs/audit.jsonl",
+        )
+    )
+
+
+def observability_surface() -> str:
+    return os.environ.get("KB_GATEWAY_SURFACE", "mcp")
+
+
+def observability_environment() -> str:
+    return os.environ.get("KB_GATEWAY_ENVIRONMENT", "production")
+
+
+def token_client_map() -> dict[str, str]:
+    """Map bearer token → client label from keys file (# cole-2026-06 lines)."""
+    mapping: dict[str, str] = {}
+    if t := api_token():
+        mapping[t] = os.environ.get("KB_GATEWAY_DEFAULT_CLIENT", "operator")
+    path = os.environ.get("KB_GATEWAY_API_KEYS_PATH")
+    if not path:
+        return mapping
+    p = Path(path)
+    if not p.is_file():
+        return mapping
+    lines = p.read_text().splitlines()
+    label = "unknown"
+    for line in lines:
+        line = line.strip()
+        if not line:
+            continue
+        if line.startswith("#"):
+            body = line.lstrip("#").strip()
+            if body:
+                parts = body.split()
+                if parts:
+                    tag = parts[0].split("-")[0].lower()
+                    if tag:
+                        label = tag
+            continue
+        mapping[line] = label
+    return mapping

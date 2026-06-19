@@ -8,8 +8,10 @@ from typing import Any
 from .config import ALLOWED_NAMESPACES
 from . import graph as kg
 from .lc_bootstrap import ensure_langchain_course
+from .observability import instrument_tool
 
 
+@instrument_tool("route_query")
 def route_query(question: str, k: int = 6, max_retries: int = 2) -> dict[str, Any]:
     """Agentic router: auto-pick graph vs vector vs both."""
     ensure_langchain_course()
@@ -18,6 +20,7 @@ def route_query(question: str, k: int = 6, max_retries: int = 2) -> dict[str, An
     return _rq(question, k=k, max_retries=max_retries)
 
 
+@instrument_tool("query_namespace")
 def query_namespace(
     question: str,
     namespace: str = "patterns",
@@ -51,6 +54,7 @@ def query_namespace(
     }
 
 
+@instrument_tool("list_namespaces")
 def list_namespaces() -> list[dict[str, Any]]:
     """Registered namespaces with live vector counts (collaborator subset highlighted)."""
     ensure_langchain_course()
@@ -73,6 +77,7 @@ def list_namespaces() -> list[dict[str, Any]]:
     return out
 
 
+@instrument_tool("graph_query")
 def graph_query(
     mode: str,
     *,
@@ -102,6 +107,7 @@ def graph_query(
     raise ValueError("mode must be stats | lane | topics | disputes")
 
 
+@instrument_tool("health")
 def health() -> dict[str, Any]:
     """Liveness + dependency checks (no secrets)."""
     status: dict[str, Any] = {"ok": True, "checks": {}}

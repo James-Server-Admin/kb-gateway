@@ -4,4 +4,6 @@ __pycache__/
 .env
 .env.*
 config/cole-mcp.json
+logs/
+*.jsonl
 *.log

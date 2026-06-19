@@ -28,5 +28,47 @@
     "question": "how do I use LangGraph checkpointers for persistence?",
     "expected_route": "vector",
     "notes": "langchain-docs namespace"
+  },
+  {
+    "id": "vector-storybrand",
+    "question": "what is the StoryBrand framework one-liner structure?",
+    "expected_route": "vector",
+    "notes": "marketing copy course content"
+  },
+  {
+    "id": "graph-disputes",
+    "question": "do any courses disagree about negotiation opening tactics?",
+    "expected_route": "graph",
+    "notes": "CONTRADICTS / disputes in graph"
+  },
+  {
+    "id": "vector-headline",
+    "question": "how do I write a benefit-led headline?",
+    "expected_route": "vector",
+    "notes": "copywriting how-to"
+  },
+  {
+    "id": "graph-coverage",
+    "question": "which courses cover copywriting in the knowledge graph?",
+    "expected_route": "graph",
+    "notes": "coverage / structure question"
+  },
+  {
+    "id": "vector-rag-eval",
+    "question": "how do I evaluate RAG faithfulness with RAGAS?",
+    "expected_route": "vector",
+    "notes": "advanced-langchain RAGAS section"
+  },
+  {
+    "id": "vector-langsmith",
+    "question": "how do I enable LangSmith tracing for a LangChain app?",
+    "expected_route": "vector",
+    "notes": "langsmith-tracing-bootstrap pattern"
+  },
+  {
+    "id": "both-meta-ads",
+    "question": "best practices for Meta lead gen and what does the corpus cover on tracking?",
+    "expected_route": "both",
+    "notes": "synthesis + graph coverage"
   }
 ]

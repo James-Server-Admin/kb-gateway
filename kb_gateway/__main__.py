@@ -18,6 +18,11 @@ def main() -> None:
     p.add_argument("--no-auth", action="store_true", help="disable bearer auth (localhost dev only)")
     args = p.parse_args()
 
+    if args.no_auth:
+        from .context import set_client
+
+        set_client("local")
+
     mcp = build_mcp(enable_auth=False if args.no_auth else None)
     mcp.run(transport=args.transport)
 
