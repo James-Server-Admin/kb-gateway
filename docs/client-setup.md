@@ -17,7 +17,7 @@
 }
 ```
 
-Clone `James-server/kb-gateway`, run `./scripts/setup-mcp.sh` — pulls token from GitHub variables.
+Clone `James-Server-Admin/kb-gateway`, run `./scripts/setup-mcp.sh` — pulls token from GitHub variables.
 
 ## Tailscale (optional private path)
 

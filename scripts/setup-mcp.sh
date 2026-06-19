@@ -3,7 +3,7 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-REPO="${KB_GATEWAY_GH_REPO:-James-server/kb-gateway}"
+REPO="${KB_GATEWAY_GH_REPO:-James-Server-Admin/kb-gateway}"
 OUT="${ROOT}/config/mcp.json"
 
 if ! command -v gh >/dev/null; then
@@ -17,18 +17,25 @@ fetch_var() {
 
 URL="$(fetch_var "$REPO" KB_GATEWAY_MCP_URL)"
 TOKEN="$(fetch_var "$REPO" KB_GATEWAY_MCP_TOKEN)"
-if [[ -z "$URL" || -z "$TOKEN" ]] && [[ "$REPO" != "okrealai/kb-gateway" ]]; then
-  REPO="okrealai/kb-gateway"
-  URL="$(fetch_var "$REPO" KB_GATEWAY_MCP_URL)"
-  TOKEN="$(fetch_var "$REPO" KB_GATEWAY_MCP_TOKEN)"
+if [[ -z "$URL" || -z "$TOKEN" ]]; then
+  for fallback in okrealai/kb-gateway; do
+    [[ "$REPO" == "$fallback" ]] && continue
+    URL="$(fetch_var "$fallback" KB_GATEWAY_MCP_URL)"
+    TOKEN="$(fetch_var "$fallback" KB_GATEWAY_MCP_TOKEN)"
+    if [[ -n "$URL" && -n "$TOKEN" ]]; then
+      REPO="$fallback"
+      break
+    fi
+  done
 fi
 
 if [[ -z "$URL" || -z "$TOKEN" ]]; then
   echo "error: KB_GATEWAY_MCP_URL or KB_GATEWAY_MCP_TOKEN not set on $REPO" >&2
-  echo "  Try: KB_GATEWAY_GH_REPO=okrealai/kb-gateway ./scripts/setup-mcp.sh" >&2
   echo "  Operator: run scripts/sync-gh-variables.sh on the server" >&2
   exit 1
 fi
+
+echo "Using repo: $REPO"
 
 mkdir -p "${ROOT}/config"
 python3 - <<PY
@@ -43,7 +50,6 @@ cfg = {
     }
 }
 Path("${OUT}").write_text(json.dumps(cfg, indent=2) + "\n")
-# Back-compat alias for Cole
 cole = {
     "mcpServers": {
         "keyflo-learning-kb": {

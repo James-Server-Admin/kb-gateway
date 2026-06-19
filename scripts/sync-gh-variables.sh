@@ -2,9 +2,13 @@
 # Sync MCP handoff variables to kb-gateway GitHub repo.
 set -euo pipefail
 
-REPO="${KB_GATEWAY_GH_REPO:-James-server/kb-gateway}"
+REPO="${KB_GATEWAY_GH_REPO:-James-Server-Admin/kb-gateway}"
 KEYS="/mnt/blockstorage/private/credentials/learning-kb-api-keys.txt"
-URL="${KB_GATEWAY_MCP_URL:-https://kb-mcp.waytie.com/mcp}"
+
+source /mnt/blockstorage/env/load.sh kb-gateway 2>/dev/null || true
+BASE="${KB_GATEWAY_PUBLIC_URL:-https://kb-mcp.waytie.com}"
+BASE="${BASE%/}"
+URL="${KB_GATEWAY_MCP_URL:-${BASE}/mcp}"
 
 cole_token="$(python3 - <<'PY'
 from pathlib import Path

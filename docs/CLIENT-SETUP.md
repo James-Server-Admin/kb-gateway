@@ -1,6 +1,6 @@
 # Client setup — kb-gateway MCP
 
-**Repo:** `James-server/kb-gateway` (mirror: `okrealai/kb-gateway` until transfer)  
+**Repo:** `James-Server-Admin/kb-gateway`  
 **Purpose:** Query the learning corpus via MCP (`route_query`, `query_namespace`, `graph_query`) from Cursor or any MCP client.
 
 **No Tailscale required** — use the public HTTPS endpoint on James's domain.
@@ -11,12 +11,10 @@
 
 1. **Clone the repo**
    ```bash
-   git clone git@github.com:James-server/kb-gateway.git
+   git clone git@github.com:James-Server-Admin/kb-gateway.git
    cd kb-gateway
    gh auth login   # once, with your GitHub account
    ```
-
-   If `James-server/kb-gateway` is not live yet, use `okrealai/kb-gateway` and set `KB_GATEWAY_GH_REPO=okrealai/kb-gateway`.
 
 2. **Pull MCP config from GitHub variables**
    ```bash
@@ -64,7 +62,7 @@ If you only need Q&A without MCP tools:
 
 | Item | Value |
 |------|-------|
-| Repo | `KeyFlo-ai/knowledge-base` |
+| Repo | `James-Server-Admin/keyflo-learning-kb` |
 | URL | `https://kb-api.keyflo.ai/v1/query` |
 
 Same corpus, simpler for scripts.

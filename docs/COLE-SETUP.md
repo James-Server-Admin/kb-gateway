@@ -1,15 +1,14 @@
 # Cole setup — kb-gateway MCP
 
-> **Canonical guide:** [`docs/CLIENT-SETUP.md`](CLIENT-SETUP.md)  
-> This file is kept for backward compatibility with existing links and `COLE_SETUP` GitHub variable.
+> **Canonical guide:** [`docs/CLIENT-SETUP.md`](CLIENT-SETUP.md)
 
-**Repo:** `James-server/kb-gateway`  
+**Repo:** `James-Server-Admin/kb-gateway`  
 **URL:** `https://kb-mcp.waytie.com/mcp`
 
 ```bash
-git clone git@github.com:James-server/kb-gateway.git
+git clone git@github.com:James-Server-Admin/kb-gateway.git
 cd kb-gateway
-./scripts/setup-mcp.sh   # or setup-cole-mcp.sh (alias)
+./scripts/setup-mcp.sh
 cat config/mcp.json
 ```
 

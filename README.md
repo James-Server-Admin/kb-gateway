@@ -2,7 +2,7 @@
 
 HTTP MCP gateway for the **learning corpus** — Pinecone + Neo4j + agentic router — usable from anywhere.
 
-**Production:** `https://kb-mcp.waytie.com/mcp` · **Repo home:** [`James-server/kb-gateway`](https://github.com/James-server/kb-gateway) (interim: [`okrealai/kb-gateway`](https://github.com/okrealai/kb-gateway))
+**Production:** `https://kb-mcp.waytie.com/mcp` · **Repo home:** [`James-Server-Admin/kb-gateway`](https://github.com/James-Server-Admin/kb-gateway)
 
 | Audience | Start here |
 |---|---|
