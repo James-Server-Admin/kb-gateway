@@ -7,4 +7,6 @@ config/cole-mcp.json
 logs/
 *.jsonl
 *.log
+!eval/reports/
+!eval/reports/*.json
 !eval/golden_ragas.jsonl

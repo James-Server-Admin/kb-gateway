@@ -20,6 +20,27 @@
 
 Managed WAF: enable **Bot Fight Mode** + **OWASP Core Ruleset** on zone (dashboard).
 
+## Apply via API (recommended once WAF token exists)
+
+```bash
+# 1. Create WAF token (one-time) — needs cole@keyflo.ai Global API Key OR dashboard token create:
+#    Save to /mnt/blockstorage/private/credentials/keyflo-cloudflare-waf-api-token.txt
+#    Scopes: Zone WAF Edit + Zone Read on keyflo.ai only
+
+KEYFLO_CLOUDFLARE_GLOBAL_API_KEY=... python3 \
+  /mnt/blockstorage/private/credentials/scripts/provision-keyflo-cloudflare-waf-token.py
+
+# 2. Apply rules
+cd /mnt/blockstorage/business/Keyflo_AI/08_Development/kb-gateway
+./scripts/setup_cloudflare_rate_limit.sh
+```
+
+**Note:** `keyflo-cloudflare-api-token.txt` is **DNS-only** — it cannot call the WAF Rulesets API (HTTP 403).
+
+## Origin fallback (active now)
+
+nginx rate limit `120r/m` per IP on `/mcp` — see `deploy/nginx-kb-mcp-rate-limit.conf` (installed in `/etc/nginx/conf.d/`).
+
 ## Apply via dashboard (~2 min)
 
 1. Cloudflare → `keyflo.ai` → **Security** → **WAF** → **Rate limiting rules**
