@@ -1,5 +1,8 @@
 # Friend setup — learning KB MCP
 
+**Request access:** https://kb-access.waytie.com  
+(James approves — you'll get an email with a setup link.)
+
 **For:** Friends James invites (outside Keyflo)  
 **Repo:** [`James-Server-Admin/kb-gateway`](https://github.com/James-Server-Admin/kb-gateway)  
 **MCP URL:** `https://kb-mcp.waytie.com/mcp`
@@ -10,12 +13,14 @@ Query ~116 marketing/engineering courses from Cursor — read-only, no server ac
 
 ## What James sends you
 
-1. **GitHub invite** — read access to `James-Server-Admin/kb-gateway` (accept the email)
-2. **Bearer token** — private message (Signal, 1Password, etc.) — **never commit or paste in GitHub**
+**Just this link:** https://kb-access.waytie.com
+
+Fill the form (name, email, GitHub username). After James approves, you'll get an email with a one-time claim link for your MCP token and Cursor config.
 
 ---
 
-## Quick start (Cursor — 5 min)
+## Legacy manual setup (if James sent a token directly)
+
 
 ### Option A — script (recommended)
 
@@ -99,18 +104,8 @@ Full specs: [`docs/ENDPOINT-CATALOG.md`](ENDPOINT-CATALOG.md)
 
 ---
 
-## Operator (James) — onboarding a friend
+## Operator (James)
 
-1. Add token to `learning-kb-api-keys.txt`:
-   ```
-   # friendname-2026-06
-   <openssl rand -hex 32>
-   ```
-2. Invite on GitHub: `James-Server-Admin/kb-gateway` → Collaborators → Read
-3. Send friend this file + token out of band
-4. Optional smoke from server:
-   ```bash
-   KB_GATEWAY_PUBLIC_URL=https://kb-mcp.waytie.com/mcp ./scripts/verify_remote_mcp.sh
-   ```
+**Default:** share https://kb-access.waytie.com — approve from Slack. See [`ACCESS-REQUEST.md`](ACCESS-REQUEST.md).
 
-GitHub variable **`FRIEND_SETUP`** on the repo points here.
+**Manual fallback** (if portal down): add token to `learning-kb-api-keys.txt`, GitHub invite, send `FRIEND-SETUP.md`.

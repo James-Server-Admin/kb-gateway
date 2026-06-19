@@ -23,7 +23,7 @@ gh auth login
 | Audience | Start here |
 |---|---|
 | **Cole / KeyFlo collaborators** | [`docs/COLE-SETUP.md`](docs/COLE-SETUP.md) |
-| **Friends (external)** | [`docs/FRIEND-SETUP.md`](docs/FRIEND-SETUP.md) · GitHub variable `FRIEND_SETUP` |
+| **Friends (external)** | [`docs/FRIEND-SETUP.md`](docs/FRIEND-SETUP.md) · Request: **https://kb-access.waytie.com** |
 | **External collaborators** | [`James-Server-Admin/kb-gateway`](https://github.com/James-Server-Admin/kb-gateway) |
 | **LLMs / agents** | [`AGENTS.md`](AGENTS.md) |
 | **Discovery** | [`llms.txt`](llms.txt) |

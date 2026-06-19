@@ -1,0 +1,19 @@
+[Unit]
+Description=KB access request portal (kb-access.waytie.com)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/mnt/blockstorage/business/Keyflo_AI/08_Development/kb-gateway
+Environment=PYTHONPATH=/mnt/blockstorage/business/Keyflo_AI/08_Development/kb-gateway
+EnvironmentFile=/mnt/blockstorage/env/kb-access.env
+EnvironmentFile=/mnt/blockstorage/env/paperclip-notifier.env
+EnvironmentFile=/mnt/blockstorage/env/keyflo.env
+ExecStart=/root/.venv-langchain-course/bin/python -m access
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

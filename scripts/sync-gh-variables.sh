@@ -43,8 +43,8 @@ for REPO in "${REPOS[@]}"; do
   gh variable set KB_GATEWAY_MCP_TOKEN --body "$cole_token" -R "$REPO"
   gh variable set KB_GATEWAY_REPO --body "James-Server-Admin/kb-gateway" -R "$REPO"
   gh variable set CLIENT_SETUP --body "Read docs/CLIENT-SETUP.md. Run ./scripts/setup-mcp.sh then add config/mcp.json to Cursor MCP." -R "$REPO"
-  FRIEND_SETUP="Read docs/FRIEND-SETUP.md. James sends your bearer token separately. Clone James-Server-Admin/kb-gateway, export KB_GATEWAY_MCP_TOKEN, run ./scripts/setup-friend-mcp.sh. URL: ${URL}"
-  gh variable set FRIEND_SETUP --body "$FRIEND_SETUP" -R "$REPO"
+  gh variable set FRIEND_SETUP --body "Request access: https://kb-access.waytie.com — after approval follow docs/FRIEND-SETUP.md claim link." -R "$REPO"
+  gh variable set ACCESS_REQUEST_URL --body "https://kb-access.waytie.com" -R "$REPO"
   if [[ "$REPO" == "KeyFlo-ai/kb-gateway" ]]; then
     gh variable set COLE_SETUP --body "$COLE_SETUP_KEYFLO" -R "$REPO"
   else
