@@ -1,7 +1,7 @@
 # Runbook — kb-gateway
 
 **Owner:** James Smith · **Backup:** Cole Wrightson  
-**Last reviewed:** 2026-06-19 · **Production:** true (`https://kb-mcp.keyflo.ai/mcp`)
+**Last reviewed:** 2026-06-19 · **Production:** true (`https://kb-mcp.waytie.com/mcp`)
 
 ## 1. System overview
 
@@ -10,7 +10,7 @@ HTTP MCP gateway for learning corpus queries. Entry: `python -m kb_gateway --tra
 | Component | Location |
 |---|---|
 | Service | `kb-gateway.service` |
-| Public URL | `https://kb-mcp.keyflo.ai/mcp` |
+| Public URL | `https://kb-mcp.waytie.com/mcp` (legacy: `kb-mcp.keyflo.ai`) |
 | Audit log | `logs/audit.jsonl` (JSONL, no secrets) |
 | LangSmith | project `LANGCHAIN-APP`, metadata `surface=mcp` |
 

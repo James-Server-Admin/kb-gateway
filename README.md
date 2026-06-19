@@ -2,13 +2,15 @@
 
 HTTP MCP gateway for the **learning corpus** — Pinecone + Neo4j + agentic router — usable from anywhere.
 
+**Production:** `https://kb-mcp.waytie.com/mcp` · **Repo home:** [`James-server/kb-gateway`](https://github.com/James-server/kb-gateway) (interim: [`okrealai/kb-gateway`](https://github.com/okrealai/kb-gateway))
+
 | Audience | Start here |
 |---|---|
-| **Cole / collaborators** | [`docs/COLE-SETUP.md`](docs/COLE-SETUP.md) |
+| **Clients / collaborators** | [`docs/CLIENT-SETUP.md`](docs/CLIENT-SETUP.md) |
 | **LLMs / agents** | [`AGENTS.md`](AGENTS.md) |
 | **Humans** | This README |
 | **Discovery** | [`llms.txt`](llms.txt) |
-| **Gated project run dir** | [`../09_Projects/kb-gateway/run/STATE.md`](../09_Projects/kb-gateway/run/STATE.md) · **Next:** [`04-HARDENING-PLAN.md`](../09_Projects/kb-gateway/run/04-HARDENING-PLAN.md) |
+| **Gated project run dir** | [`../09_Projects/kb-gateway/run/STATE.md`](../09_Projects/kb-gateway/run/STATE.md) |
 
 ## What it does
 

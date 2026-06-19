@@ -5,7 +5,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 source /mnt/blockstorage/env/load.sh global 2>/dev/null || true
 
-URL="${KB_GATEWAY_PUBLIC_URL:-https://kb-mcp.keyflo.ai/mcp}"
+URL="${KB_GATEWAY_PUBLIC_URL:-https://kb-mcp.waytie.com/mcp}"
 PY="${PY:-/root/.venv-langchain-course/bin/python}"
 KEYS="${KB_GATEWAY_API_KEYS_PATH:-/mnt/blockstorage/private/credentials/learning-kb-api-keys.txt}"
 

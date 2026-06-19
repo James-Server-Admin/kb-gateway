@@ -1,12 +1,14 @@
 # Client setup — wire remote agents to kb-gateway
 
-## Cole / remote MCP (HTTPS — no Tailscale needed)
+**Canonical guide:** [`docs/CLIENT-SETUP.md`](CLIENT-SETUP.md)
+
+## Remote MCP (HTTPS)
 
 ```json
 {
   "mcpServers": {
-    "keyflo-learning-kb": {
-      "url": "https://kb-mcp.keyflo.ai/mcp",
+    "learning-kb": {
+      "url": "https://kb-mcp.waytie.com/mcp",
       "headers": {
         "Authorization": "Bearer YOUR_KB_GATEWAY_MCP_TOKEN"
       }
@@ -15,11 +17,11 @@
 }
 ```
 
-**Cole:** clone `KeyFlo-ai/kb-gateway`, run `./scripts/setup-cole-mcp.sh` — pulls token from GitHub variables. Full guide: [`docs/COLE-SETUP.md`](COLE-SETUP.md).
+Clone `James-server/kb-gateway`, run `./scripts/setup-mcp.sh` — pulls token from GitHub variables.
 
 ## Tailscale (optional private path)
 
-On tailnet `smithjsfamily@gmail.com`: `http://100.122.28.113:8790/mcp` with same bearer token. Invite Cole at https://login.tailscale.com/admin/users.
+On tailnet `smithjsfamily@gmail.com`: `http://100.122.28.113:8790/mcp` with same bearer token.
 
 ## Cursor on the server (stdio)
 
