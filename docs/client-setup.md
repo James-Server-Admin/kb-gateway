@@ -4,6 +4,8 @@
 
 Add MCP server in Cursor settings (Streamable HTTP):
 
+**After Tailscale Serve is enabled** (see [`deployment.md`](deployment.md)), use the HTTPS URL Tailscale assigns to `vetriq-server`:
+
 ```json
 {
   "mcpServers": {

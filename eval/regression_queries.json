@@ -1,0 +1,32 @@
+[
+  {
+    "id": "vector-pas",
+    "question": "what is PAS copy structure?",
+    "expected_route": "vector",
+    "notes": "Copywriting formula — patterns / transcripts"
+  },
+  {
+    "id": "vector-mcp-hosting",
+    "question": "how should I expose an MCP server for remote agents?",
+    "expected_route": "vector",
+    "notes": "mcp-server-as-internal-boundary pattern"
+  },
+  {
+    "id": "graph-topics",
+    "question": "what topics exist in the learning knowledge graph for LangGraph?",
+    "expected_route": "graph",
+    "notes": "Neo4j topic / discipline traversal"
+  },
+  {
+    "id": "both-campaign",
+    "question": "how do I structure a Meta lead gen campaign and what related topics are in the graph?",
+    "expected_route": "both",
+    "notes": "Hybrid vector + graph"
+  },
+  {
+    "id": "vector-langchain",
+    "question": "how do I use LangGraph checkpointers for persistence?",
+    "expected_route": "vector",
+    "notes": "langchain-docs namespace"
+  }
+]

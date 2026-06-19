@@ -35,7 +35,7 @@ Register via NEW-SECRET-INTAKE:
 
 | Secret | Scope | Consumer |
 |---|---|---|
-| `KB_GATEWAY_API_TOKEN` | global or keyflo | Remote MCP clients |
+| `KB_GATEWAY_API_TOKEN` | `/mnt/blockstorage/env/kb-gateway.env` | Remote MCP clients (systemd only) |
 | Existing `LEARNING_*` | global.env | Server runtime only |
 
 Never give remote agents Pinecone or Neo4j credentials — they use MCP tools only.
@@ -44,7 +44,7 @@ Never give remote agents Pinecone or Neo4j credentials — they use MCP tools on
 
 | Method | When | Notes |
 |---|---|---|
-| **Tailscale** | Preferred for Cole + your machines | `tailscale serve https / http://127.0.0.1:8790` |
+| **Tailscale Serve** | Preferred for Cole + your machines | Enable at [tailscale serve admin](https://login.tailscale.com/f/serve); then `sudo tailscale serve --bg http://127.0.0.1:8790`. Server node: `vetriq-server` (100.122.28.113). |
 | **Cloudflare Tunnel** | Public HTTPS with Access policy | Zero trust; no open ports |
 | **SSH tunnel** | Dev / emergency | `ssh -L 8790:127.0.0.1:8790 server` |
 
