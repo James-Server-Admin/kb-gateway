@@ -11,8 +11,17 @@ if ! command -v gh >/dev/null; then
   exit 1
 fi
 
-URL="$(gh api "repos/${REPO}/actions/variables/KB_GATEWAY_MCP_URL" --jq .value 2>/dev/null || true)"
-TOKEN="$(gh api "repos/${REPO}/actions/variables/KB_GATEWAY_MCP_TOKEN" --jq .value 2>/dev/null || true)"
+fetch_var() {
+  gh api "repos/${1}/actions/variables/${2}" --jq .value 2>/dev/null || true
+}
+
+URL="$(fetch_var "$REPO" KB_GATEWAY_MCP_URL)"
+TOKEN="$(fetch_var "$REPO" KB_GATEWAY_MCP_TOKEN)"
+if [[ -z "$URL" || -z "$TOKEN" ]] && [[ "$REPO" != "okrealai/kb-gateway" ]]; then
+  REPO="okrealai/kb-gateway"
+  URL="$(fetch_var "$REPO" KB_GATEWAY_MCP_URL)"
+  TOKEN="$(fetch_var "$REPO" KB_GATEWAY_MCP_TOKEN)"
+fi
 
 if [[ -z "$URL" || -z "$TOKEN" ]]; then
   echo "error: KB_GATEWAY_MCP_URL or KB_GATEWAY_MCP_TOKEN not set on $REPO" >&2
