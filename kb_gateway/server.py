@@ -15,7 +15,7 @@ Pinecone vector index `learning` + Neo4j knowledge graph + agentic router.
 
 WHEN TO USE WHICH TOOL:
 - route_query — default when unsure (auto-picks graph vs vector vs both)
-- query_namespace — semantic/how-to when you know you need passages (patterns | course-transcripts | langchain-docs)
+- query_namespace — semantic/how-to when you know you need passages (patterns | course-transcripts | langchain-docs | research-papers)
 - graph_query — coverage, topic depth, disputes (mode: stats | lane | topics | disputes)
 - list_namespaces — discover corpora
 - health — dependency check
@@ -62,7 +62,7 @@ def build_mcp(*, enable_auth: bool | None = None) -> FastMCP:
         k: int = 4,
         rerank: bool = False,
     ) -> str:
-        """Semantic RAG against whitelisted namespace: patterns | course-transcripts | langchain-docs."""
+        """Semantic RAG against whitelisted namespace: patterns | course-transcripts | langchain-docs | research-papers."""
         return T.dumps(T.query_namespace(question, namespace=namespace, k=k, rerank=rerank))
 
     @mcp.tool()
