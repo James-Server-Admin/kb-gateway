@@ -30,6 +30,39 @@ HTTP MCP gateway for learning corpus queries. Entry: `python -m kb_gateway --tra
 | p95 route_query latency | < 45s | `scripts/usage_report.sh` |
 | Auth reject rate | alert if spike | nginx/CF logs; audit log errors |
 
+### Retrieval contract eval
+
+Run before changing MCP/HTTP query defaults, namespace allowlists, wrapper logic,
+or agent-facing docs:
+
+```bash
+./scripts/eval_retrieval_contract.py \
+  --id answer-learning-kb-canonical-surface \
+  --id answer-learning-kb-abstention-citation-fields \
+  --id pinecone-best-practices-template \
+  --id research-papers-direct-namespace \
+  --id learning-kb-broad-default
+# Full set when time allows:
+./scripts/eval_retrieval_contract.py --all
+```
+
+Required behavior:
+
+- New agent-facing clients use `answer_learning_kb` as the canonical structured
+  access method over `query_all`, `route_query`, and `query_namespace`.
+- `answer_learning_kb` responses include citation fields (`evidence.source_count`,
+  `evidence.sources`, namespace/count fields when available) and abstention
+  fields (`retrieval_status`, `next_steps`, and `errors` when present).
+- Broad research / "what do we know" uses `query_all` or local `--all-namespaces`.
+- Structural, absence, coverage, or dispute questions use `route_query`/graph.
+- Pinecone DB best-practice/template prompts use targeted `pinecone-platform`
+  plus `patterns` after the broad pass.
+- External paper/whitepaper evidence can be targeted through
+  `query_namespace(namespace="research-papers")` or
+  `answer_learning_kb(namespace="research-papers")`.
+- No "not covered" or "no context" conclusion may come from one empty
+  namespace, vector, router, or tool-error result.
+
 ## 4. Observability (W9–W15)
 
 ### Daily / weekly operator checklist
@@ -89,6 +122,7 @@ Never contains bearer tokens or full question text.
 | `weekly_ops.sh` | weekly | usage + verify + eval_routes + split assess |
 | `mint_golden_from_traces.py` | on demand / weekly | Refresh `eval/golden_ragas.jsonl` |
 | `eval_ragas.sh` | weekly / pre-release | RAGAS baseline (cap 10 default) |
+| `eval_retrieval_contract.py` | pre-release / after doc or wrapper changes | False no-context and retrieval-contract regression |
 | `assess_langsmith_split.sh` | monthly | D-008 HOLD/SPLIT recommendation |
 | `check_cole_handoff.sh` | weekly | audit `client=cole` |
 

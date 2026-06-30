@@ -4,7 +4,7 @@
 
 ## Identity
 
-HTTP MCP gateway exposing the **learning KB** (Pinecone + Neo4j + agentic router) to remote agents. GitHub: `KeyFlo-ai/kb-gateway`.
+HTTP MCP gateway exposing the **James learning KB** (Pinecone + Neo4j + agentic router) to remote agents. GitHub: `James-Server-Admin/kb-gateway`.
 
 ## Gated execution routine
 
@@ -35,7 +35,7 @@ Smoke: `scripts/smoke_test.sh`
 - READ ONLY at gateway layer — no ingest, no Neo4j writes
 - Remote clients get MCP tools only — never Pinecone/Neo4j keys
 - Namespace whitelist enforced in `kb_gateway/config.py`
-- Default remote tool: `route_query` when routing ambiguous
+- Default remote tool: `query_all` for broad research; `route_query` when routing is ambiguous or structural claims matter; Pinecone DB best-practice/template prompts need targeted `pinecone-platform` plus `patterns`
 - **Endpoint specs:** [`docs/ENDPOINT-CATALOG.md`](docs/ENDPOINT-CATALOG.md) — tools, HTTP parity, corpus inventory, routing tree
 
 ## Owners

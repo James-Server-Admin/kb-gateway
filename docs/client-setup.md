@@ -28,7 +28,7 @@ On tailnet `smithjsfamily@gmail.com`: `http://100.122.28.113:8790/mcp` with same
 ```json
 {
   "mcpServers": {
-    "keyflo-learning-kb": {
+    "learning-kb": {
       "command": "/root/.venv-langchain-course/bin/python",
       "args": ["-m", "kb_gateway", "--transport", "stdio", "--no-auth"],
       "cwd": "/mnt/blockstorage/business/Keyflo_AI/08_Development/kb-gateway",
@@ -40,4 +40,6 @@ On tailnet `smithjsfamily@gmail.com`: `http://100.122.28.113:8790/mcp` with same
 
 ## Which tool to call
 
-When unsure → **`route_query`**. See [`routing.md`](routing.md). Read [`AGENTS.md`](../AGENTS.md).
+Default agent Q&A → **`answer_learning_kb`**. Broad research / "what do we know about X" → **`answer_learning_kb(intent="broad")`** or direct **`query_all`**. When graph-vs-vector routing or structural claims matter → **`answer_learning_kb(intent="structural")`** or direct **`route_query`**. Paper evidence → **`answer_learning_kb(namespace="research-papers")`**.
+
+Responses expose `retrieval_status`, `evidence.sources`, and `next_steps`; cite sources and follow next steps before saying there is no context. See [`routing.md`](routing.md). Read [`AGENTS.md`](../AGENTS.md).

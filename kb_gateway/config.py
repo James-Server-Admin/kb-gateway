@@ -10,8 +10,8 @@ DEFAULT_HOST = "127.0.0.1"
 DEFAULT_PORT = 8790
 
 # Collaborator-safe Pinecone namespaces (fail-closed whitelist)
-# research-papers (added 2026-06-24): the :Paper subgraph corpus — external whitepapers (arXiv etc.)
-# so route_query/query_namespace can serve them alongside the course corpus.
+# research-papers (added 2026-06-24): external whitepapers exposed through
+# query_all/query_namespace alongside the course corpus.
 ALLOWED_NAMESPACES = frozenset({"patterns", "course-transcripts", "langchain-docs", "research-papers"})
 
 

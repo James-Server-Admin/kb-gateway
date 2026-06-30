@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+import html
 import hmac
 import json
 import os
@@ -13,6 +14,8 @@ from fastapi import FastAPI, Form, HTTPException, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 
 from access import provision, store
+from kb_gateway.config import api_tokens, token_client_map
+from kb_gateway.context import set_client
 
 app = FastAPI(title="KB Access Portal", version="1.0.0")
 
@@ -56,6 +59,13 @@ def _slack_notify(text: str) -> None:
         pass
 
 
+def _client_for_token(token: str) -> str | None:
+    for expected in api_tokens():
+        if hmac.compare_digest(token, expected):
+            return token_client_map().get(expected, "unknown")
+    return None
+
+
 def _page(title: str, body: str) -> HTMLResponse:
     html = f"""<!DOCTYPE html>
 <html lang="en"><head>
@@ -64,7 +74,7 @@ def _page(title: str, body: str) -> HTMLResponse:
 <style>
 body{{font-family:system-ui,sans-serif;max-width:42rem;margin:2rem auto;padding:0 1rem;line-height:1.5}}
 label{{display:block;margin:.75rem 0 .25rem;font-weight:600}}
-input,textarea{{width:100%;padding:.5rem;font-size:1rem}}
+input,textarea,select{{width:100%;padding:.5rem;font-size:1rem}}
 button{{margin-top:1rem;padding:.6rem 1.2rem;font-size:1rem;cursor:pointer}}
 .card{{border:1px solid #ddd;border-radius:8px;padding:1rem;margin:1rem 0}}
 code,pre{{background:#f4f4f4;padding:.2rem .4rem;border-radius:4px;word-break:break-all}}
@@ -95,6 +105,80 @@ def home() -> HTMLResponse:
   <button type="submit">Request access</button>
 </form>
 <p><small>Read-only learning corpus — not Keyflo product data. James approves each request.</small></p>
+<p><a href="/query">Query from browser</a></p>
+""",
+    )
+
+
+@app.get("/query", response_class=HTMLResponse)
+def query_page() -> HTMLResponse:
+    return _page(
+        "Query learning KB",
+        """
+<form method="post" action="/query">
+  <label for="token">MCP bearer token</label>
+  <input id="token" name="token" type="password" required autocomplete="off"/>
+  <label for="question">Question</label>
+  <textarea id="question" name="question" rows="5" required maxlength="4000"></textarea>
+  <label for="intent">Intent</label>
+  <select id="intent" name="intent">
+    <option value="auto">auto</option>
+    <option value="broad">broad</option>
+    <option value="structural">structural</option>
+  </select>
+  <button type="submit">Ask</button>
+</form>
+<p><small>Uses the same read-only token as MCP. No Pinecone or Neo4j keys are sent to the browser.</small></p>
+""",
+    )
+
+
+@app.post("/query", response_class=HTMLResponse)
+def submit_query(
+    token: str = Form(...),
+    question: str = Form(...),
+    intent: str = Form("auto"),
+) -> HTMLResponse:
+    client = _client_for_token(token.strip())
+    if client is None:
+        raise HTTPException(403, "Invalid token")
+    set_client(client)
+    try:
+        from kb_gateway import tools
+
+        result = tools.answer_learning_kb(
+            question=question,
+            intent=intent,
+            k=8,
+            max_retries=2,
+            include_raw=False,
+        )
+    except ValueError as exc:
+        raise HTTPException(400, str(exc)) from exc
+    except Exception as exc:
+        return _page(
+            "Query failed",
+            f"<p>Gateway query failed: <code>{html.escape(str(exc))}</code></p><p><a href=\"/query\">Try again</a></p>",
+        )
+
+    answer = html.escape(str(result.get("answer") or "No answer returned."))
+    status = html.escape(str(result.get("retrieval_status") or "unknown"))
+    evidence = html.escape(json.dumps(result.get("evidence", {}), indent=2, default=str))
+    next_steps = result.get("next_steps") or []
+    steps_html = "".join(f"<li>{html.escape(str(step))}</li>" for step in next_steps)
+    return _page(
+        "Learning KB answer",
+        f"""
+<div class="card">
+<p><strong>Status:</strong> <code>{status}</code></p>
+<pre>{answer}</pre>
+</div>
+<div class="card">
+<h2>Evidence</h2>
+<pre>{evidence}</pre>
+</div>
+{f'<div class="card"><h2>Next steps</h2><ul>{steps_html}</ul></div>' if steps_html else ''}
+<p><a href="/query">Ask another question</a></p>
 """,
     )
 

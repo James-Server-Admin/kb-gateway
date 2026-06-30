@@ -8,7 +8,7 @@ from .server import build_mcp
 
 
 def main() -> None:
-    p = argparse.ArgumentParser(description="Keyflo learning KB gateway (MCP)")
+    p = argparse.ArgumentParser(description="James learning KB gateway (MCP)")
     p.add_argument(
         "--transport",
         choices=["stdio", "streamable-http"],
