@@ -28,7 +28,7 @@ On tailnet `smithjsfamily@gmail.com`: `http://100.122.28.113:8790/mcp` with same
 ```json
 {
   "mcpServers": {
-    "keyflo-learning-kb": {
+    "learning-kb": {
       "command": "/root/.venv-langchain-course/bin/python",
       "args": ["-m", "kb_gateway", "--transport", "stdio", "--no-auth"],
       "cwd": "/mnt/blockstorage/business/Keyflo_AI/08_Development/kb-gateway",
@@ -40,4 +40,4 @@ On tailnet `smithjsfamily@gmail.com`: `http://100.122.28.113:8790/mcp` with same
 
 ## Which tool to call
 
-When unsure → **`route_query`**. See [`routing.md`](routing.md). Read [`AGENTS.md`](../AGENTS.md).
+Broad research / "what do we know about X" → **`query_all`**. When graph-vs-vector routing or structural claims matter → **`route_query`**. See [`routing.md`](routing.md). Read [`AGENTS.md`](../AGENTS.md).

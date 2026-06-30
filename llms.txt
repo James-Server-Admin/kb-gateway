@@ -10,4 +10,6 @@
 - [RUNBOOK.md](RUNBOOK.md): Ops + failure modes
 - [09_Projects/kb-gateway/run/STATE.md](../09_Projects/kb-gateway/run/STATE.md): Gated project progress
 
-MCP tools: `route_query`, `query_namespace`, `graph_query`, `list_namespaces`, `health`
+MCP tools: `query_all`, `route_query`, `query_namespace`, `graph_query`, `list_namespaces`, `health`
+
+Use `query_all` for broad research / "what do we know about X". Use `route_query` when graph-vs-vector routing is ambiguous or structural claims matter.

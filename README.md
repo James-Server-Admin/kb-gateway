@@ -1,6 +1,6 @@
 # kb-gateway
 
-HTTP MCP gateway for the **learning corpus** — Pinecone + Neo4j + agentic router.
+HTTP MCP gateway for James's **learning corpus** — Pinecone + Neo4j + agentic router.
 
 ## Cole — start here (KeyFlo org)
 
@@ -36,7 +36,8 @@ Remote agents call MCP tools instead of holding Pinecone/Neo4j credentials:
 
 | Tool | Purpose |
 |---|---|
-| `route_query` | **Default** — auto-pick graph vs vector vs both |
+| `query_all` | **Default for broad research** — full-corpus search with namespace-tagged sources |
+| `route_query` | Use when graph vs vector routing matters, or the question is structural/ambiguous |
 | `query_namespace` | Semantic RAG (`patterns`, `course-transcripts`, `langchain-docs`) |
 | `graph_query` | Neo4j coverage / disputes / topic depth |
 | `list_namespaces` | Corpus inventory |

@@ -1,7 +1,7 @@
 # Client setup — kb-gateway MCP
 
 **Repo:** `James-Server-Admin/kb-gateway`  
-**Purpose:** Query the learning corpus via MCP (`route_query`, `query_namespace`, `graph_query`) from Cursor or any MCP client.
+**Purpose:** Query James's learning corpus via MCP (`query_all`, `route_query`, `query_namespace`, `graph_query`) from Cursor or any MCP client.
 
 **No Tailscale required** — use the public HTTPS endpoint on James's domain.
 
@@ -25,7 +25,7 @@
 
 3. **Add to Cursor** → Settings → MCP → paste the `learning-kb` block from `config/mcp.json`.
 
-4. **Verify** — ask your agent: *"Use learning-kb route_query: what is PAS copy structure?"*
+4. **Verify** — ask your agent: *"Use learning-kb query_all: what is PAS copy structure?"*
 
 ---
 
@@ -35,7 +35,7 @@
 |------|-------|
 | URL | `https://kb-mcp.waytie.com/mcp` |
 | Auth | `Authorization: Bearer <token>` (from GitHub variable `KB_GATEWAY_MCP_TOKEN` or operator-issued) |
-| Tools | `route_query`, `query_namespace`, `graph_query`, `list_namespaces`, `health` |
+| Tools | `query_all`, `route_query`, `query_namespace`, `graph_query`, `list_namespaces`, `health` |
 
 Manual test:
 ```bash
@@ -91,7 +91,8 @@ James's tailnet also exposes the gateway at `http://100.122.28.113:8790/mcp` for
 
 | Question type | Tool |
 |---------------|------|
-| Not sure | `route_query` |
+| Broad research / "what do we know" | `query_all` |
+| Not sure graph vs vector | `route_query` |
 | How-to / passages | `query_namespace` |
 | Coverage / disputes | `graph_query` |
 

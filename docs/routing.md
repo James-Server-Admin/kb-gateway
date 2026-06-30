@@ -4,12 +4,13 @@ See also [`AGENTS.md`](../AGENTS.md) · corpus pattern: `langchain-course/patter
 
 | Question | Route | MCP tool |
 |---|---|---|
-| Not sure | auto | `route_query` |
+| Broad research / "what do we know?" | vector merge | `query_all` |
+| Not sure graph vs vector | auto | `route_query` |
 | How do I X? / semantic how-to | vector | `query_namespace` (course-transcripts or patterns) |
 | Which courses cover X? | graph | `graph_query` mode=topics |
 | Coverage by marketing lane | graph | `graph_query` mode=lane |
 | Do courses disagree? | graph | `graph_query` mode=disputes |
-| Broad synthesis | both | `route_query` |
+| Structural synthesis | both | `route_query` |
 
 **Why:** vectors find similar passages; graph surfaces coverage, depth, and `CONTRADICTS` edges vectors cannot see. Vector-only on structural questions hallucinates ~25–33% (router backtest).
 
@@ -24,6 +25,6 @@ See also [`AGENTS.md`](../AGENTS.md) · corpus pattern: `langchain-course/patter
 
 ## Allowed Pinecone namespaces (remote)
 
-`patterns` · `course-transcripts` · `langchain-docs`
+`patterns` · `course-transcripts` · `langchain-docs` · `research-papers`
 
 Never expose `own-notes` / `orchestrations` via this gateway.

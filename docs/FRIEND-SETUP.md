@@ -7,7 +7,7 @@
 **Repo:** [`James-Server-Admin/kb-gateway`](https://github.com/James-Server-Admin/kb-gateway)  
 **MCP URL:** `https://kb-mcp.waytie.com/mcp`
 
-Query ~116 marketing/engineering courses from Cursor — read-only, no server access needed.
+Query James's learning corpus from Cursor — ~116 courses across business, tech, finance, creative, ops, engineering, marketing, plus patterns and research papers where available. Read-only, no server access needed.
 
 ---
 
@@ -66,7 +66,7 @@ curl -s -o /dev/null -w "%{http_code}\n" \
 
 **Cursor** — ask your agent:
 
-> Use learning-kb route_query: what is PAS copy structure?
+> Use learning-kb query_all: what is PAS copy structure?
 
 ---
 
@@ -74,8 +74,9 @@ curl -s -o /dev/null -w "%{http_code}\n" \
 
 | Tool | Use when |
 |------|----------|
-| `route_query` | **Default** — not sure which store to use |
-| `query_namespace` | How-to / passages (`course-transcripts`, `patterns`, `langchain-docs`) |
+| `query_all` | **Default for broad research** / "what do we know about X" |
+| `route_query` | Not sure whether graph, vector, or both are needed |
+| `query_namespace` | How-to / passages (`course-transcripts`, `patterns`, `langchain-docs`, `research-papers`) |
 | `graph_query` | Coverage, topic depth, cross-course disputes |
 | `list_namespaces` | See what's in the corpus |
 | `health` | Check the service is up |

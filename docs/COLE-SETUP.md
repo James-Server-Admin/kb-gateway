@@ -28,7 +28,7 @@
 
 3. **Cursor** → Settings → MCP → paste the `learning-kb` block from `config/mcp.json`.
 
-4. **Verify** — ask your agent: *"Use learning-kb route_query: what is PAS copy structure?"*
+4. **Verify** — ask your agent: *"Use learning-kb query_all: what is PAS copy structure?"*
 
 Expect MCP handshake (not `401`). Same bearer token works for `kb-api.keyflo.ai` HTTP queries.
 
@@ -59,8 +59,9 @@ Expect `406` or `200`, not `401`.
 
 | Tool | When |
 |------|------|
-| `route_query` | **Default** — auto-pick vector vs graph |
-| `query_namespace` | How-to / passage lookup |
+| `query_all` | **Default for broad research** / "what do we know about X" |
+| `route_query` | Auto-pick vector vs graph when routing or structure matters |
+| `query_namespace` | How-to / passage lookup in a known namespace |
 | `graph_query` | Coverage, disputes, topic depth |
 | `list_namespaces` | Corpus inventory |
 | `health` | Dependency check |

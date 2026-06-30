@@ -35,7 +35,7 @@ Smoke: `scripts/smoke_test.sh`
 - READ ONLY at gateway layer — no ingest, no Neo4j writes
 - Remote clients get MCP tools only — never Pinecone/Neo4j keys
 - Namespace whitelist enforced in `kb_gateway/config.py`
-- Default remote tool: `route_query` when routing ambiguous
+- Default remote tool: `query_all` for broad research; `route_query` when routing is ambiguous or structural claims matter
 - **Endpoint specs:** [`docs/ENDPOINT-CATALOG.md`](docs/ENDPOINT-CATALOG.md) — tools, HTTP parity, corpus inventory, routing tree
 
 ## Owners
