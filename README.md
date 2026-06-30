@@ -36,12 +36,17 @@ Remote agents call MCP tools instead of holding Pinecone/Neo4j credentials:
 
 | Tool | Purpose |
 |---|---|
+| `answer_learning_kb` | **Canonical structured answer** — stable wrapper over routing/full-corpus retrieval with sanitized evidence |
 | `query_all` | **Default for broad research** — full-corpus search with namespace-tagged sources |
 | `route_query` | Use when graph vs vector routing matters, or the question is structural/ambiguous |
 | `query_namespace` | Semantic RAG (`patterns`, `course-transcripts`, `langchain-docs`, `research-papers`) |
 | `graph_query` | Neo4j coverage / disputes / topic depth |
 | `list_namespaces` | Corpus inventory |
 | `health` | Dependency check |
+
+Browser/mobile query page: `https://kb-access.waytie.com/query` uses the same issued MCP bearer token and returns the `answer_learning_kb` contract without exposing Pinecone/Neo4j credentials.
+
+For new agents, call `answer_learning_kb` first. Use `intent="broad"` for full-corpus research, `intent="structural"` for coverage/dispute questions, and `namespace="research-papers"` when external paper evidence is the target. Responses include `retrieval_status`, `evidence.sources`, and `next_steps`; do not make a no-context claim from one empty result.
 
 ## Quick start (server operator)
 

@@ -7,8 +7,25 @@ from typing import Any
 
 from .config import ALLOWED_NAMESPACES
 from . import graph as kg
+from .context import get_client
 from .lc_bootstrap import ensure_langchain_course
 from .observability import instrument_tool
+
+OWNER_CLIENTS = frozenset({"operator", "local", "owner", "james"})
+STRUCTURAL_HINTS = (
+    "which course",
+    "which courses",
+    "where is",
+    "coverage",
+    "covered",
+    "topic depth",
+    "disagree",
+    "disagreement",
+    "contradict",
+    "relationship",
+    "graph",
+    "compare",
+)
 
 
 def _refused(structured_response: Any) -> bool:
@@ -40,6 +57,102 @@ def _with_retrieval_status(result: dict[str, Any], *, surface: str) -> dict[str,
     return out
 
 
+def _client_access() -> dict[str, Any]:
+    client = get_client()
+    role = "owner" if client in OWNER_CLIENTS else "collaborator"
+    return {
+        "client": client,
+        "role": role,
+        "allowed_namespaces": sorted(ALLOWED_NAMESPACES),
+        "raw_evidence_allowed": role == "owner",
+    }
+
+
+def _pick_surface(question: str, intent: str, namespace: str | None) -> str:
+    requested = (intent or "auto").strip().lower()
+    if namespace:
+        return "query_namespace"
+    if requested in {"broad", "query_all", "full", "full_corpus"}:
+        return "query_all"
+    if requested in {"structural", "routing", "route", "graph", "coverage", "disputes"}:
+        return "route_query"
+    if requested != "auto":
+        raise ValueError("intent must be auto | broad | structural | routing | graph | coverage | disputes")
+    q = question.lower()
+    if any(hint in q for hint in STRUCTURAL_HINTS):
+        return "route_query"
+    return "query_all"
+
+
+def _source_value(doc: Any, key: str) -> Any:
+    if isinstance(doc, dict):
+        if key in doc:
+            return doc.get(key)
+        meta = doc.get("metadata")
+        if isinstance(meta, dict):
+            return meta.get(key)
+    meta = getattr(doc, "metadata", None)
+    if isinstance(meta, dict):
+        return meta.get(key)
+    return None
+
+
+def _sanitize_sources(source_documents: Any) -> list[dict[str, Any]]:
+    docs = source_documents if isinstance(source_documents, list) else []
+    out: list[dict[str, Any]] = []
+    allowed_keys = (
+        "namespace",
+        "source",
+        "title",
+        "course",
+        "lecture",
+        "doc_type",
+        "url",
+        "file_path",
+        "chunk_id",
+    )
+    for i, doc in enumerate(docs, start=1):
+        ref = {"index": i}
+        for key in allowed_keys:
+            val = _source_value(doc, key)
+            if val:
+                ref[key] = val
+        ns = ref.get("namespace")
+        if ns and ns not in ALLOWED_NAMESPACES:
+            ref["namespace"] = "redacted"
+        out.append(ref)
+    return out
+
+
+def _safe_namespaces(namespaces: Any) -> list[str]:
+    if not isinstance(namespaces, list):
+        return []
+    return sorted({str(ns) for ns in namespaces if str(ns) in ALLOWED_NAMESPACES})
+
+
+def _safe_counts(counts: Any) -> dict[str, int]:
+    if not isinstance(counts, dict):
+        return {}
+    return {
+        str(ns): int(count)
+        for ns, count in counts.items()
+        if str(ns) in ALLOWED_NAMESPACES and isinstance(count, int)
+    }
+
+
+def _next_steps(result: dict[str, Any], surface: str) -> list[str]:
+    if result.get("retrieval_status") == "ok":
+        return []
+    steps = [
+        "Do not make an absence claim from this response alone.",
+        "Retry with answer_learning_kb(intent='broad') for full-corpus vector retrieval.",
+        "Use answer_learning_kb(intent='structural') when coverage, course inventory, disputes, or graph relationships matter.",
+    ]
+    if surface == "query_namespace":
+        steps.append("Try the broad intent or a different allowed namespace before concluding the corpus lacks coverage.")
+    return steps
+
+
 @instrument_tool("route_query")
 def route_query(question: str, k: int = 6, max_retries: int = 2) -> dict[str, Any]:
     """Agentic router: auto-pick graph vs vector vs both."""
@@ -47,6 +160,85 @@ def route_query(question: str, k: int = 6, max_retries: int = 2) -> dict[str, An
     from runtime.agentic_router import route_query as _rq
 
     return _with_retrieval_status(_rq(question, k=k, max_retries=max_retries), surface="route_query")
+
+
+@instrument_tool("answer_learning_kb")
+def answer_learning_kb(
+    question: str,
+    intent: str = "auto",
+    k: int = 8,
+    max_retries: int = 2,
+    namespace: str | None = None,
+    include_raw: bool = False,
+) -> dict[str, Any]:
+    """Canonical answer surface over the learning KB.
+
+    Returns a stable, collaborator-safe contract over the existing read-only
+    route_query/query_all/query_namespace tools. Raw retrieval payloads are
+    owner-only and opt-in; normal responses expose sanitized source metadata.
+    """
+    q = question.strip()
+    if not q:
+        raise ValueError("question is required")
+    if len(q) > 4000:
+        raise ValueError("question must be 4000 characters or less")
+    if k < 1 or k > 12:
+        raise ValueError("k must be between 1 and 12")
+    if namespace and namespace not in ALLOWED_NAMESPACES:
+        raise ValueError(
+            f"namespace {namespace!r} not allowed. Use one of: {sorted(ALLOWED_NAMESPACES)}"
+        )
+
+    access = _client_access()
+    surface = _pick_surface(q, intent, namespace)
+    if surface == "query_namespace":
+        result = query_namespace(q, namespace=namespace or "patterns", k=k)
+    elif surface == "route_query":
+        result = route_query(q, k=k, max_retries=max_retries)
+    else:
+        result = query_all(q, k=k)
+
+    source_documents = result.get("source_documents") or []
+    response: dict[str, Any] = {
+        "surface": "answer_learning_kb",
+        "tool_used": surface,
+        "question": q,
+        "answer": result.get("answer"),
+        "retrieval_status": result.get("retrieval_status", "ok"),
+        "access": access,
+        "routing": {
+            "intent": intent,
+            "route": result.get("route"),
+            "route_reason": result.get("route_reason"),
+            "namespace": result.get("namespace") or namespace,
+        },
+        "evidence": {
+            "source_count": len(source_documents) if isinstance(source_documents, list) else 0,
+            "sources": _sanitize_sources(source_documents),
+            "namespaces": _safe_namespaces(result.get("namespaces")),
+            "per_namespace_counts": _safe_counts(result.get("per_namespace_counts")),
+            "graph_context_present": bool((result.get("graph_context") or "").strip()),
+        },
+        "cautions": [
+            "Learning KB only; do not use as Keyflo product messaging source of truth.",
+            "Cite retrieved sources in downstream outputs.",
+        ],
+        "next_steps": _next_steps(result, surface),
+    }
+    errors = result.get("errors")
+    if errors:
+        response["errors"] = errors
+    graph_context = (result.get("graph_context") or "").strip()
+    if graph_context:
+        response["graph_context"] = graph_context
+    if include_raw and access["raw_evidence_allowed"]:
+        response["raw_result"] = result
+    elif include_raw:
+        response["raw_result"] = {
+            "refused": True,
+            "reason": "Raw evidence is owner-only; sanitized sources are included in evidence.sources.",
+        }
+    return response
 
 
 @instrument_tool("query_all")

@@ -4,7 +4,7 @@
 **Last verified:** 2026-06-19 (live Pinecone + Neo4j stats)  
 **Canonical doc:** this file · **Routing:** [`routing.md`](routing.md) · **MCP setup:** [`COLE-SETUP.md`](COLE-SETUP.md)
 
-Use this catalog to pick the **right surface and tool** without guessing. Default broad research / "what do we know about X": **`query_all`**. Use **`route_query`** when graph-vs-vector routing is uncertain or structural claims matter.
+Use this catalog to pick the **right surface and tool** without guessing. Default single-shot answer surface: **`answer_learning_kb`**. Use **`query_all`** for direct full-corpus retrieval and **`route_query`** when graph-vs-vector routing is uncertain or structural claims matter.
 
 ---
 
@@ -57,12 +57,14 @@ Use this catalog to pick the **right surface and tool** without guessing. Defaul
 
 ```
 Question?
+├─ Need stable answer contract? ─────────────► answer_learning_kb
 ├─ Broad research / "what do we know?" ──────► query_all
 ├─ Unsure vector vs graph? ──────────────────► route_query
 ├─ How-to / passages / "explain X"? ─────────► query_namespace (pick namespace)
 │   ├─ course material ──► course-transcripts
 │   ├─ process/SOP ──────► patterns
-│   └─ LangChain stack ──► langchain-docs
+│   ├─ LangChain stack ──► langchain-docs
+│   └─ external papers ──► research-papers
 ├─ Which courses cover X? / depth / lanes? ──► graph_query (mode=topics|lane|stats)
 ├─ Do courses disagree? ─────────────────────► graph_query (mode=disputes) or route_query
 └─ What can I query? ────────────────────────► list_namespaces or graph_query (mode=stats)
@@ -70,6 +72,7 @@ Question?
 
 | Question shape | Route | MCP tool | HTTP equivalent |
 |----------------|-------|----------|-----------------|
+| Stable answer contract | auto | `answer_learning_kb` | Browser `/query` |
 | Open-ended / full-corpus research | vector merge | `query_all` | `POST /v1/query` default |
 | Routing ambiguity / structural synthesis | auto | `route_query` | `POST /v1/query` with `all_namespaces=false` |
 | Semantic how-to | vector | `query_namespace` | — (use MCP or SSH `query_db.py`) |
@@ -81,6 +84,43 @@ Question?
 ## 4. Endpoint specs
 
 Each entry follows the **endpoint card** template in [§7](#7-endpoint-card-template).
+
+---
+
+### EP-MCP-000 · `answer_learning_kb`
+
+| Field | Value |
+|-------|-------|
+| **Surface** | MCP |
+| **Auth** | Bearer `learning:read` |
+| **When to use** | Preferred single-shot Q&A when callers need a stable structured contract. |
+| **When NOT** | Low-level debugging of the router or graph; call `route_query`, `query_all`, or `graph_query` directly. |
+| **Request** | `question: string`, `intent: auto|broad|structural`, `k: 1-12`, `max_retries`, optional `namespace`, `include_raw` |
+| **Response** | `{ surface, tool_used, question, answer, retrieval_status, access, routing, evidence, cautions, next_steps }` |
+| **Access behavior** | Collaborators get sanitized source metadata. Owner/local clients may opt into `raw_result` with `include_raw=true`. |
+| **Limits** | Question max 4000 chars. Allowed namespaces only: `patterns`, `course-transcripts`, `langchain-docs`, `research-papers`. |
+| **Example** | `answer_learning_kb("what do we know about PAS copy structure?", intent="auto")` |
+| **Composes with** | Direct tools when an agent needs lower-level graph/vector debugging. |
+
+`answer_learning_kb` chooses `tool_used=query_all` for broad/full-corpus questions and `tool_used=route_query` for structural, coverage, dispute, or graph questions. Direct paper evidence can be requested with `namespace="research-papers"`, which uses `query_namespace`.
+
+Required response contract:
+
+| Field | Required use |
+|-------|--------------|
+| `routing.intent` | Caller intent used for tool selection |
+| `routing.route` / `routing.route_reason` | Router details when structural routing is used |
+| `evidence.source_count` | Citation count for the answer |
+| `evidence.sources` | Sanitized citation metadata agents must cite downstream |
+| `evidence.namespaces` | Full-corpus namespaces searched by broad retrieval |
+| `evidence.per_namespace_counts` | Per-namespace retrieval counts when available |
+| `evidence.graph_context_present` | Whether graph facts were available for structural claims |
+| `retrieval_status` | `ok`, `insufficient_context`, or `tool_error` style status from lower-level retrieval |
+| `next_steps` | Abstention/retry instructions; do not make an absence claim when populated |
+| `cautions` | Corpus boundary and citation reminders |
+| `errors` | Tooling failures when present; classify as tooling, not corpus absence |
+
+False no-context rule: one empty namespace, vector, router, or tool-error result is not enough to say the learning KB lacks coverage. Retry with `answer_learning_kb(intent="broad")` for full-corpus retrieval, then `answer_learning_kb(intent="structural")` or `graph_query` for coverage/dispute claims, and check `health` when errors are present.
 
 ---
 
@@ -207,15 +247,35 @@ Each entry follows the **endpoint card** template in [§7](#7-endpoint-card-temp
 
 ---
 
+### EP-WEB-001 · `GET/POST /query`
+
+| Field | Value |
+|-------|-------|
+| **Surface** | Browser/mobile @ `https://kb-access.waytie.com/query` |
+| **Auth** | Issued MCP bearer token entered by user |
+| **When to use** | Quick human query from mobile or a browser when MCP client setup is not available. |
+| **When NOT** | Automation or agent workflows; use MCP `answer_learning_kb`. |
+| **Request** | Form fields: `token`, `question`, `intent` (`auto`, `broad`, `structural`) |
+| **Response** | HTML rendering of `answer_learning_kb` answer, retrieval status, sanitized evidence, and next steps. |
+| **Limits** | Same token registry as MCP; question max 4000 chars. |
+| **Security** | Browser receives no Pinecone/Neo4j credentials and no raw retrieval payload. |
+
+---
+
 ## 5. Response field glossary
 
 | Field | Meaning | Trust for structure? |
 |-------|---------|----------------------|
 | `answer` | LLM synthesis from retrieved context | Cite sources; don't treat as authoritative alone |
+| `tool_used` | Lower-level tool selected by `answer_learning_kb` | Debug routing and evals |
+| `retrieval_status` | Retrieval adequacy/status from the selected tool | Abstain or retry when not `ok` |
 | `route` | `vector` \| `graph` \| `both` | Which stores were used |
 | `route_reason` | Classifier rationale | Debug routing |
 | `graph_context` | Neo4j facts prepended to answer | **Yes** for coverage/disputes |
 | `source_documents` | Chunk / file IDs | Always cite in agent output |
+| `evidence` | Sanitized source metadata from `answer_learning_kb` | Cite source refs; no raw chunk text by default |
+| `evidence.sources` | Citation metadata from `answer_learning_kb` | Always cite in downstream answers |
+| `next_steps` | Retry/abstention guidance from `answer_learning_kb` | Follow before declaring no coverage |
 | `structured_response` | Full RAG response object (MCP namespace queries) | Optional parse |
 | `lectures` / `courses` | Graph topic counts | **Yes** — graph-grounded |
 | `confidence` (disputes) | CONTRADICTS edge weight | Higher = stronger disagreement signal |
@@ -227,9 +287,11 @@ Each entry follows the **endpoint card** template in [§7](#7-endpoint-card-temp
 1. **Start:** `health` → `list_namespaces` if corpus unfamiliar.  
 2. **Plan:** Use [§3 routing](#3-agent-routing-30-second-decision) — don't default every question to `course-transcripts` or a single router pass.  
 3. **Execute:**  
+   - Stable answer contract → `answer_learning_kb`
    - Broad research / "what do we know" → `query_all`  
    - Ambiguous graph-vs-vector or structural synthesis → `route_query`  
    - LangChain implementation → `query_namespace(..., namespace="langchain-docs")`  
+   - External papers / whitepapers → `query_namespace(..., namespace="research-papers")`  
    - Process/SOP from patterns → `query_namespace(..., namespace="patterns")`  
    - Marketing depth inventory → `graph_query(mode="lane", lane="copy"|"design"|"campaign"|"tracking")`  
    - Topic coverage → `graph_query(mode="topics", topics="...")`  
@@ -289,4 +351,5 @@ Copy this block for each new endpoint (MCP tool, HTTP route, or CLI command).
 
 | Date | Change |
 |------|--------|
+| 2026-06-30 | Added canonical `answer_learning_kb` contract, browser query surface, and no-false-no-context response fields |
 | 2026-06-19 | Initial catalog from live index stats + MCP/HTTP inventory |

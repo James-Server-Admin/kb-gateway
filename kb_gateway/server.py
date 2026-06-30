@@ -14,6 +14,7 @@ James learning KB gateway. Exposes read-mostly access to the learning corpus:
 Pinecone vector index `learning` + Neo4j knowledge graph + agentic router.
 
 WHEN TO USE WHICH TOOL:
+- answer_learning_kb — canonical structured answer wrapper; use first when you want a stable response contract
 - query_all — default for broad research / "what do we know" / full-corpus synthesis
 - route_query — use when graph-vs-vector routing is ambiguous or structural claims matter
 - query_namespace — semantic/how-to when you know you need passages (patterns | course-transcripts | langchain-docs | research-papers)
@@ -51,6 +52,27 @@ def build_mcp(*, enable_auth: bool | None = None) -> FastMCP:
         kwargs["token_verifier"] = StaticTokenVerifier(tokens)
 
     mcp = FastMCP(**kwargs)
+
+    @mcp.tool()
+    def answer_learning_kb(
+        question: str,
+        intent: str = "auto",
+        k: int = 8,
+        max_retries: int = 2,
+        namespace: str = "",
+        include_raw: bool = False,
+    ) -> str:
+        """Canonical structured answer wrapper over learning KB retrieval. Prefer this for stable Q&A output."""
+        return T.dumps(
+            T.answer_learning_kb(
+                question,
+                intent=intent,
+                k=k,
+                max_retries=max_retries,
+                namespace=namespace or None,
+                include_raw=include_raw,
+            )
+        )
 
     @mcp.tool()
     def route_query(question: str, k: int = 6, max_retries: int = 2) -> str:
