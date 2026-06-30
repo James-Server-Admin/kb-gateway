@@ -113,6 +113,18 @@ def _sanitize_sources(source_documents: Any) -> list[dict[str, Any]]:
     )
     for i, doc in enumerate(docs, start=1):
         ref = {"index": i}
+        if isinstance(doc, str):
+            if "/" in doc:
+                ns, source = doc.split("/", 1)
+                if ns in ALLOWED_NAMESPACES:
+                    ref["namespace"] = ns
+                    ref["source"] = source
+                else:
+                    ref["source"] = doc
+            else:
+                ref["source"] = doc
+            out.append(ref)
+            continue
         for key in allowed_keys:
             val = _source_value(doc, key)
             if val:
