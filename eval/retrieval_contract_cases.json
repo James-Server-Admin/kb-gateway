@@ -1,5 +1,49 @@
 [
   {
+    "id": "answer-learning-kb-canonical-surface",
+    "difficulty": "easy",
+    "input_text": "what is the canonical way for an agent to answer from the learning KB?",
+    "surface": "docs",
+    "expected_tools": "answer_learning_kb",
+    "expected_sources_any": ["answer_learning_kb", "canonical", "query_all", "route_query"],
+    "expected_response_fields": ["surface", "tool_used", "answer", "retrieval_status", "evidence.sources", "next_steps"],
+    "forbidden_phrases": ["raw Pinecone credentials", "single router pass is enough"],
+    "source": "2026-06-30 canonical answer surface contract"
+  },
+  {
+    "id": "answer-learning-kb-broad-uses-query-all",
+    "difficulty": "easy",
+    "input_text": "Use answer_learning_kb to answer: what do we know about RAG evaluation?",
+    "surface": "docs",
+    "expected_tools": "answer_learning_kb(intent=auto|broad) -> query_all",
+    "expected_sources_any": ["Broad research", "query_all", "full-corpus", "course-transcripts", "research-papers"],
+    "expected_response_fields": ["routing.intent", "tool_used", "evidence.namespaces", "evidence.per_namespace_counts"],
+    "forbidden_phrases": ["route_query default only", "course-transcripts only"],
+    "source": "2026-06-30 answer_learning_kb broad routing contract"
+  },
+  {
+    "id": "answer-learning-kb-structural-uses-router",
+    "difficulty": "medium",
+    "input_text": "Use answer_learning_kb to answer: which courses cover Pinecone vector databases?",
+    "surface": "docs",
+    "expected_tools": "answer_learning_kb(intent=structural) -> route_query/graph_query",
+    "expected_sources_any": ["structural", "route_query", "graph_query", "graph_context"],
+    "expected_response_fields": ["routing.route", "routing.route_reason", "evidence.graph_context_present"],
+    "forbidden_phrases": ["vector-only is sufficient", "one empty vector result proves absence"],
+    "source": "2026-06-30 answer_learning_kb structural routing contract"
+  },
+  {
+    "id": "answer-learning-kb-abstention-citation-fields",
+    "difficulty": "medium",
+    "input_text": "What fields must answer_learning_kb return when retrieval is empty or unsafe to answer?",
+    "surface": "docs",
+    "expected_tools": "answer_learning_kb",
+    "expected_sources_any": ["retrieval_status", "next_steps", "evidence.sources", "Cite retrieved sources"],
+    "expected_response_fields": ["retrieval_status", "evidence.source_count", "evidence.sources", "cautions", "next_steps", "errors"],
+    "forbidden_phrases": ["answer no context immediately", "conclude not covered from one result"],
+    "source": "2026-06-30 abstention and citation field contract"
+  },
+  {
     "id": "pinecone-best-practices-template",
     "difficulty": "easy",
     "input_text": "Pinecone database best practices and templates for querying the learning KB",
@@ -58,6 +102,17 @@
     "expected_sources_any": ["research-papers", "Paper", "whitepaper"],
     "forbidden_phrases": ["only three namespaces", "research-papers not allowed"],
     "source": "namespace allowlist regression"
+  },
+  {
+    "id": "research-papers-direct-namespace",
+    "difficulty": "easy",
+    "input_text": "Use research-papers directly for external paper evidence about retrieval evaluation",
+    "surface": "docs",
+    "expected_tools": "query_namespace(namespace=research-papers)",
+    "expected_sources_any": ["research-papers", "query_namespace", "paper", "whitepaper"],
+    "expected_response_fields": ["answer", "namespace", "source_documents", "structured_response"],
+    "forbidden_phrases": ["research-papers not allowed", "only three namespaces"],
+    "source": "2026-06-30 research-papers direct namespace contract"
   },
   {
     "id": "route-structural-coverage",
@@ -198,5 +253,27 @@
     "expected_sources_any": ["query_all", "route_query", "pinecone-platform", "patterns"],
     "forbidden_phrases": ["use as Keyflo product SoT"],
     "source": "cross-agent handoff"
+  },
+  {
+    "id": "pinecone-template-targeted-retrieval",
+    "difficulty": "medium",
+    "input_text": "Find the Pinecone platform template for namespace-aware learning KB retrieval",
+    "surface": "local-wrapper",
+    "expected_tools": "pinecone-platform,patterns",
+    "expected_sources_any": ["pinecone-platform", "patterns", "template", "namespace"],
+    "expected_response_fields": ["Sources"],
+    "forbidden_phrases": ["no context", "not covered", "context does not provide specific best practices"],
+    "source": "2026-06-30 Pinecone template targeted retrieval regression"
+  },
+  {
+    "id": "false-no-context-retry-contract",
+    "difficulty": "hard",
+    "input_text": "If answer_learning_kb or a namespace query returns empty results, what should the agent do before saying the KB lacks coverage?",
+    "surface": "docs",
+    "expected_tools": "answer_learning_kb(intent=broad),answer_learning_kb(intent=structural)",
+    "expected_sources_any": ["Do not make an absence claim", "Retry", "full-corpus", "graph", "tooling"],
+    "expected_response_fields": ["retrieval_status", "next_steps", "errors"],
+    "forbidden_phrases": ["one empty result proves absence", "say no context"],
+    "source": "2026-06-30 no false no-context retry contract"
   }
 ]

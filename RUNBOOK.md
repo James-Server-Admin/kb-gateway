@@ -36,19 +36,32 @@ Run before changing MCP/HTTP query defaults, namespace allowlists, wrapper logic
 or agent-facing docs:
 
 ```bash
-./scripts/eval_retrieval_contract.py --id pinecone-best-practices-template --id learning-kb-broad-default
+./scripts/eval_retrieval_contract.py \
+  --id answer-learning-kb-canonical-surface \
+  --id answer-learning-kb-abstention-citation-fields \
+  --id pinecone-best-practices-template \
+  --id research-papers-direct-namespace \
+  --id learning-kb-broad-default
 # Full set when time allows:
 ./scripts/eval_retrieval_contract.py --all
 ```
 
 Required behavior:
 
+- New agent-facing clients use `answer_learning_kb` as the canonical structured
+  access method over `query_all`, `route_query`, and `query_namespace`.
+- `answer_learning_kb` responses include citation fields (`evidence.source_count`,
+  `evidence.sources`, namespace/count fields when available) and abstention
+  fields (`retrieval_status`, `next_steps`, and `errors` when present).
 - Broad research / "what do we know" uses `query_all` or local `--all-namespaces`.
 - Structural, absence, coverage, or dispute questions use `route_query`/graph.
 - Pinecone DB best-practice/template prompts use targeted `pinecone-platform`
   plus `patterns` after the broad pass.
+- External paper/whitepaper evidence can be targeted through
+  `query_namespace(namespace="research-papers")` or
+  `answer_learning_kb(namespace="research-papers")`.
 - No "not covered" or "no context" conclusion may come from one empty
-  vector/router result.
+  namespace, vector, router, or tool-error result.
 
 ## 4. Observability (W9–W15)
 

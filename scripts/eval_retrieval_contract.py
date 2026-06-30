@@ -71,6 +71,11 @@ def check_case(row: dict, output: str, rc: int) -> list[str]:
     expected_any = row.get("expected_sources_any", [])
     if expected_any and not any(term.lower() in lowered for term in expected_any):
         failures.append("none of expected source terms found: " + ", ".join(expected_any))
+    for field in row.get("expected_response_fields", []):
+        parts = [part for part in str(field).lower().replace("_", "-").split(".") if part]
+        normalized = lowered.replace("_", "-")
+        if str(field).lower() not in lowered and not all(part in normalized for part in parts):
+            failures.append(f"expected response field missing: {field}")
     return failures
 
 
@@ -93,7 +98,7 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--cases", type=Path, default=DEFAULT_CASES)
     parser.add_argument("--limit", type=int, default=5, help="default keeps smoke fast")
-    parser.add_argument("--all", action="store_true", help="run all 20 cases")
+    parser.add_argument("--all", action="store_true", help="run all cases")
     parser.add_argument("--id", action="append", dest="ids", help="run one or more case ids")
     args = parser.parse_args()
 
