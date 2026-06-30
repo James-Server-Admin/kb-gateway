@@ -10,17 +10,19 @@ from .config import api_tokens, gateway_host, gateway_port, public_url
 from . import tools as T
 
 INSTRUCTIONS = """
-Keyflo learning KB gateway. Exposes read-mostly access to the learning corpus:
+James learning KB gateway. Exposes read-mostly access to the learning corpus:
 Pinecone vector index `learning` + Neo4j knowledge graph + agentic router.
 
 WHEN TO USE WHICH TOOL:
-- route_query — default when unsure (auto-picks graph vs vector vs both)
+- query_all — default for broad research / "what do we know" / full-corpus synthesis
+- route_query — use when graph-vs-vector routing is ambiguous or structural claims matter
 - query_namespace — semantic/how-to when you know you need passages (patterns | course-transcripts | langchain-docs | research-papers)
 - graph_query — coverage, topic depth, disputes (mode: stats | lane | topics | disputes)
 - list_namespaces — discover corpora
 - health — dependency check
 
 Do NOT use for Keyflo product messaging (use keyflo_source_of_truth / Qdrant).
+Do NOT claim "not covered" from one empty vector/router result; use full-corpus plus graph/tooling-health checks.
 Read-only only — no writes.
 """.strip()
 
@@ -54,6 +56,13 @@ def build_mcp(*, enable_auth: bool | None = None) -> FastMCP:
     def route_query(question: str, k: int = 6, max_retries: int = 2) -> str:
         """Classify and answer using agentic router (graph | vector | both). Use when routing is ambiguous."""
         return T.dumps(T.route_query(question, k=k, max_retries=max_retries))
+
+    @mcp.tool()
+    def query_all(question: str, k: int = 8) -> str:
+        """Full-corpus search: course-transcripts + patterns + research-papers (whitepapers)
+        merged into one answer with namespace-tagged sources. Prefer this for general research /
+        'what do we know about X' — it sees the WHOLE knowledge base, not just one namespace."""
+        return T.dumps(T.query_all(question, k=k))
 
     @mcp.tool()
     def query_namespace(

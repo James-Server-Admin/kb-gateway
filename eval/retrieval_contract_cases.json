@@ -1,0 +1,202 @@
+[
+  {
+    "id": "pinecone-best-practices-template",
+    "difficulty": "easy",
+    "input_text": "Pinecone database best practices and templates for querying the learning KB",
+    "surface": "local-wrapper",
+    "expected_tools": "pinecone-platform,patterns",
+    "expected_sources_any": ["docs/INDEX-REGISTRY.yaml", "docs/NAMESPACES-ALL.yaml", "RUNBOOK.md", "pinecone-platform-bootstrap-workflow"],
+    "forbidden_phrases": ["context does not provide specific best practices", "no context", "not covered"],
+    "source": "2026-06-30 false-no-context regression"
+  },
+  {
+    "id": "pinecone-namespace-method",
+    "difficulty": "easy",
+    "input_text": "what is the right method for agents to query Pinecone namespaces in the learning KB?",
+    "surface": "local-wrapper",
+    "expected_tools": "pinecone-platform,patterns",
+    "expected_sources_any": ["NAMESPACES-ALL.yaml", "INDEX-REGISTRY.yaml", "gated-execution-routine.md"],
+    "forbidden_phrases": ["no context", "not covered"],
+    "source": "2026-06-30 targeted pinecone-platform pass"
+  },
+  {
+    "id": "learning-kb-broad-default",
+    "difficulty": "easy",
+    "input_text": "what do we know about the gated execution routine?",
+    "surface": "local-wrapper",
+    "expected_tools": "query_all/all-namespaces",
+    "expected_sources_any": ["patterns", "gated-execution-routine"],
+    "forbidden_phrases": ["no context", "not covered"],
+    "source": "broad research default"
+  },
+  {
+    "id": "absence-claim-requires-graph",
+    "difficulty": "medium",
+    "input_text": "is computer vision covered in the learning KB?",
+    "surface": "graph-required",
+    "expected_tools": "graph_query/route_query",
+    "expected_sources_any": ["graph", "topic", "course", "coverage"],
+    "forbidden_phrases": ["one empty", "vector result proves"],
+    "source": "absence claim guard"
+  },
+  {
+    "id": "keyflo-boundary",
+    "difficulty": "medium",
+    "input_text": "use the learning KB to answer Keyflo product positioning claims",
+    "surface": "instructional",
+    "expected_tools": "boundary-refusal",
+    "expected_sources_any": ["not Keyflo product", "product SoT", "source-of-truth"],
+    "forbidden_phrases": ["Keyflo product truth from this corpus"],
+    "source": "business-boundary guard"
+  },
+  {
+    "id": "research-papers-available",
+    "difficulty": "medium",
+    "input_text": "what research papers are available in the learning KB?",
+    "surface": "local-wrapper",
+    "expected_tools": "query_all/all-namespaces",
+    "expected_sources_any": ["research-papers", "Paper", "whitepaper"],
+    "forbidden_phrases": ["only three namespaces", "research-papers not allowed"],
+    "source": "namespace allowlist regression"
+  },
+  {
+    "id": "route-structural-coverage",
+    "difficulty": "easy",
+    "input_text": "which courses cover Pinecone vector databases?",
+    "surface": "graph-required",
+    "expected_tools": "graph_query/route_query",
+    "expected_sources_any": ["course", "lecture", "topic", "Pinecone"],
+    "forbidden_phrases": ["vector-only", "not covered"],
+    "source": "structural coverage"
+  },
+  {
+    "id": "dispute-question",
+    "difficulty": "medium",
+    "input_text": "do courses disagree about negotiation openings?",
+    "surface": "graph-required",
+    "expected_tools": "graph_query/route_query",
+    "expected_sources_any": ["disagree", "CONTRADICTS", "dispute", "graph"],
+    "forbidden_phrases": ["no disagreement from vector"],
+    "source": "dispute routing"
+  },
+  {
+    "id": "patterns-namespace",
+    "difficulty": "easy",
+    "input_text": "how do I query the patterns namespace for proven engineering playbooks?",
+    "surface": "local-wrapper",
+    "expected_tools": "query_all/all-namespaces",
+    "expected_sources_any": ["patterns", "proven"],
+    "forbidden_phrases": ["no context"],
+    "source": "patterns visibility"
+  },
+  {
+    "id": "langchain-docs-known-namespace",
+    "difficulty": "easy",
+    "input_text": "how do I use LangGraph checkpointers for persistence?",
+    "surface": "namespace-or-query_all",
+    "expected_tools": "query_namespace/query_all",
+    "expected_sources_any": ["langchain-docs", "checkpointer", "LangGraph"],
+    "forbidden_phrases": ["no context"],
+    "source": "known namespace"
+  },
+  {
+    "id": "operator-memory-boundary",
+    "difficulty": "medium",
+    "input_text": "retrieve prior decisions James made about the learning KB",
+    "surface": "instructional",
+    "expected_tools": "mem-search/retrieve",
+    "expected_sources_any": ["memory", "retrieve", "mem search"],
+    "forbidden_phrases": ["learning corpus is operator memory"],
+    "source": "memory boundary"
+  },
+  {
+    "id": "web-research-order",
+    "difficulty": "easy",
+    "input_text": "research best practices for multi-namespace RAG",
+    "surface": "local-wrapper-first",
+    "expected_tools": "learning-kb-query before web",
+    "expected_sources_any": ["learning KB", "query_all", "all-namespaces"],
+    "forbidden_phrases": ["web first"],
+    "source": "research-first order"
+  },
+  {
+    "id": "mcp-tool-list",
+    "difficulty": "easy",
+    "input_text": "what MCP tools are available for the learning KB?",
+    "surface": "docs",
+    "expected_tools": "query_all,route_query,query_namespace,graph_query,list_namespaces,health",
+    "expected_sources_any": ["query_all", "route_query", "query_namespace", "graph_query"],
+    "forbidden_phrases": ["route_query, query_namespace, graph_query, list_namespaces, health"],
+    "source": "tool-list drift"
+  },
+  {
+    "id": "http-default",
+    "difficulty": "easy",
+    "input_text": "what does POST /v1/query default to?",
+    "surface": "docs",
+    "expected_tools": "all_namespaces=true/query_all",
+    "expected_sources_any": ["all_namespaces", "query_all", "full-corpus"],
+    "forbidden_phrases": ["only exposes route_query"],
+    "source": "HTTP default drift"
+  },
+  {
+    "id": "legacy-name-correction",
+    "difficulty": "easy",
+    "input_text": "is this the Keyflo KB?",
+    "surface": "instructional",
+    "expected_tools": "boundary-refusal",
+    "expected_sources_any": ["James learning KB", "not Keyflo product"],
+    "forbidden_phrases": ["Keyflo product KB"],
+    "source": "naming drift"
+  },
+  {
+    "id": "platform-fabric",
+    "difficulty": "medium",
+    "input_text": "how should platform fabric ownership be queried?",
+    "surface": "targeted",
+    "expected_tools": "platform-fabric/patterns",
+    "expected_sources_any": ["platform-fabric", "fabric_id", "platform-execution-routine"],
+    "forbidden_phrases": ["no context"],
+    "source": "platform namespace targeting"
+  },
+  {
+    "id": "empty-tooling-gap",
+    "difficulty": "hard",
+    "input_text": "the learning KB returned nothing because the gateway errored; what should I conclude?",
+    "surface": "instructional",
+    "expected_tools": "tooling-health gate",
+    "expected_sources_any": ["tooling", "not corpus absence", "failed surface"],
+    "forbidden_phrases": ["KB lacks content"],
+    "source": "tooling failure guard"
+  },
+  {
+    "id": "course-technique",
+    "difficulty": "easy",
+    "input_text": "what do the courses say about PAS copy structure?",
+    "surface": "local-wrapper",
+    "expected_tools": "query_all/course-transcripts",
+    "expected_sources_any": ["course-transcripts", "PAS"],
+    "forbidden_phrases": ["no context"],
+    "source": "course technique"
+  },
+  {
+    "id": "broad-synthesis",
+    "difficulty": "medium",
+    "input_text": "what is the best approach to RAG evaluation considering the full corpus?",
+    "surface": "local-wrapper",
+    "expected_tools": "query_all/all-namespaces",
+    "expected_sources_any": ["RAGAS", "eval", "patterns"],
+    "forbidden_phrases": ["route_query default only"],
+    "source": "broad synthesis default"
+  },
+  {
+    "id": "agent-handoff",
+    "difficulty": "easy",
+    "input_text": "write the handoff instruction for Claude/Grok/Gemini/Codex to query the learning KB",
+    "surface": "handoff",
+    "expected_tools": "local-wrapper/query_all/route_query/pinecone-platform",
+    "expected_sources_any": ["query_all", "route_query", "pinecone-platform", "patterns"],
+    "forbidden_phrases": ["Keyflo product SoT"],
+    "source": "cross-agent handoff"
+  }
+]

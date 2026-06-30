@@ -110,8 +110,8 @@ Each entry follows the **endpoint card** template in [§7](#7-endpoint-card-temp
 | **When NOT** | You need graph coverage/dispute facts or a known single namespace. Pair with `graph_query` for absence/coverage claims. |
 | **Request** | `question: str` (3–4000 chars) · `k: int` default 8 |
 | **Response** | JSON string: `{ answer, namespaces, per_namespace_counts, source_documents[], structured_response }` |
-| **Example** | `query_all("Pinecone database best practices and templates for querying the learning KB", k=8)` |
-| **Composes with** | `route_query` or `graph_query` for structural, disagreement, or absence claims |
+| **Example** | `query_all("what do we know about multi-namespace RAG?", k=8)` |
+| **Composes with** | `route_query` or `graph_query` for structural, disagreement, or absence claims. For Pinecone DB best-practice/template prompts, follow with targeted local/operator `pinecone-platform` + `patterns` hybrid passes. |
 
 ---
 

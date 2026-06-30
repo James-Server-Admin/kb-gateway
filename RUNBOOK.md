@@ -30,6 +30,26 @@ HTTP MCP gateway for learning corpus queries. Entry: `python -m kb_gateway --tra
 | p95 route_query latency | < 45s | `scripts/usage_report.sh` |
 | Auth reject rate | alert if spike | nginx/CF logs; audit log errors |
 
+### Retrieval contract eval
+
+Run before changing MCP/HTTP query defaults, namespace allowlists, wrapper logic,
+or agent-facing docs:
+
+```bash
+./scripts/eval_retrieval_contract.py --id pinecone-best-practices-template --id learning-kb-broad-default
+# Full set when time allows:
+./scripts/eval_retrieval_contract.py --all
+```
+
+Required behavior:
+
+- Broad research / "what do we know" uses `query_all` or local `--all-namespaces`.
+- Structural, absence, coverage, or dispute questions use `route_query`/graph.
+- Pinecone DB best-practice/template prompts use targeted `pinecone-platform`
+  plus `patterns` after the broad pass.
+- No "not covered" or "no context" conclusion may come from one empty
+  vector/router result.
+
 ## 4. Observability (W9–W15)
 
 ### Daily / weekly operator checklist
@@ -89,6 +109,7 @@ Never contains bearer tokens or full question text.
 | `weekly_ops.sh` | weekly | usage + verify + eval_routes + split assess |
 | `mint_golden_from_traces.py` | on demand / weekly | Refresh `eval/golden_ragas.jsonl` |
 | `eval_ragas.sh` | weekly / pre-release | RAGAS baseline (cap 10 default) |
+| `eval_retrieval_contract.py` | pre-release / after doc or wrapper changes | False no-context and retrieval-contract regression |
 | `assess_langsmith_split.sh` | monthly | D-008 HOLD/SPLIT recommendation |
 | `check_cole_handoff.sh` | weekly | audit `client=cole` |
 
