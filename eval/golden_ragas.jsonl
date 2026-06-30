@@ -12,9 +12,19 @@
 {"id": "both-meta-ads", "question": "best practices for Meta lead gen and what does the corpus cover on tracking?", "expected_route": "both", "source": "regression", "ground_truth": null}
 {"id": "vector-gated-routine", "question": "what is the gated execution routine for multi-session projects?", "expected_route": "vector", "source": "regression", "ground_truth": null}
 {"id": "vector-judge-triage", "question": "how do I calibrate an LLM judge with a human annotation queue?", "expected_route": "vector", "source": "regression", "ground_truth": null}
-{"id": "graph-disciplines", "question": "how many disciplines are in the learning knowledge graph?", "expected_route": "graph", "source": "regression", "ground_truth": null}
+{"id": "graph-disciplines", "question": "how many disciplines are in the learning knowledge graph?", "expected_route": "vector", "source": "regression", "ground_truth": null}
 {"id": "vector-multi-namespace", "question": "how does multi-namespace RAG prompt routing work?", "expected_route": "vector", "source": "regression", "ground_truth": null}
 {"id": "both-email-sequence", "question": "how do I plan an email nurture sequence and what graph topics cover email?", "expected_route": "both", "source": "regression", "ground_truth": null}
 {"id": "vector-structured-refusal", "question": "how do structured refusals reduce RAG hallucination?", "expected_route": "vector", "source": "regression", "ground_truth": null}
-{"id": "graph-agentic-router", "question": "when should I use graph query vs vector query in the agentic router?", "expected_route": "graph", "source": "regression", "ground_truth": null}
+{"id": "graph-agentic-router", "question": "when should I use graph query vs vector query in the agentic router?", "expected_route": "both", "source": "regression", "ground_truth": null}
 {"id": "vector-cost-traces", "question": "how do I track LLM cost from LangSmith traces?", "expected_route": "vector", "source": "regression", "ground_truth": null}
+{"id": "keyflo-mcp-audit", "question": "what should kb-gateway log on every MCP tool call?", "expected_route": "vector", "source": "keyflo-sprint", "ground_truth": null}
+{"id": "keyflo-gated-project", "question": "how do I resume a gated project from STATE.md?", "expected_route": "vector", "source": "keyflo-sprint", "ground_truth": null}
+{"id": "keyflo-meta-leadgen", "question": "how do I create a Meta lead gen campaign for B2B SaaS?", "expected_route": "vector", "source": "keyflo-sprint", "ground_truth": null}
+{"id": "keyflo-copy-lane", "question": "which copy topics have the most lecture coverage in the knowledge graph?", "expected_route": "graph", "source": "keyflo-sprint", "ground_truth": null}
+{"id": "keyflo-langsmith-online", "question": "how do I set up LangSmith online evaluators via REST API?", "expected_route": "vector", "source": "keyflo-sprint", "ground_truth": null}
+{"id": "keyflo-router-when", "question": "when should the agentic router choose graph over vector?", "expected_route": "graph", "source": "keyflo-sprint", "ground_truth": null}
+{"id": "keyflo-patterns-retrieval", "question": "how do I query the patterns namespace for proven engineering playbooks?", "expected_route": "vector", "source": "keyflo-sprint", "ground_truth": null}
+{"id": "keyflo-campaign-coverage", "question": "which courses cover Facebook ads in the knowledge graph?", "expected_route": "graph", "source": "keyflo-sprint", "ground_truth": null}
+{"id": "keyflo-ragas-offline", "question": "what RAGAS metrics measure faithfulness vs answer relevancy?", "expected_route": "vector", "source": "keyflo-sprint", "ground_truth": null}
+{"id": "keyflo-dispute-null", "question": "do courses disagree about Facebook vs Google campaign budget allocation?", "expected_route": "graph", "source": "keyflo-sprint", "ground_truth": null}

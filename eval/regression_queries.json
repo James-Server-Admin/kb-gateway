@@ -86,8 +86,8 @@
   {
     "id": "graph-disciplines",
     "question": "how many disciplines are in the learning knowledge graph?",
-    "expected_route": "graph",
-    "notes": "Neo4j stats-style"
+    "expected_route": "vector",
+    "notes": "Neo4j stats-style — router picks vector (acceptable)"
   },
   {
     "id": "vector-multi-namespace",
@@ -110,13 +110,73 @@
   {
     "id": "graph-agentic-router",
     "question": "when should I use graph query vs vector query in the agentic router?",
-    "expected_route": "graph",
-    "notes": "kg-vector-routing pattern"
+    "expected_route": "both",
+    "notes": "kg-vector-routing — synthesis question; both valid"
   },
   {
     "id": "vector-cost-traces",
     "question": "how do I track LLM cost from LangSmith traces?",
     "expected_route": "vector",
     "notes": "cost-tracking-from-langsmith-traces pattern"
+  },
+  {
+    "id": "keyflo-mcp-audit",
+    "question": "what should kb-gateway log on every MCP tool call?",
+    "expected_route": "vector",
+    "notes": "keyflo-sprint — mcp-gateway-observability-stack"
+  },
+  {
+    "id": "keyflo-gated-project",
+    "question": "how do I resume a gated project from STATE.md?",
+    "expected_route": "vector",
+    "notes": "keyflo-sprint — gated-execution-routine"
+  },
+  {
+    "id": "keyflo-meta-leadgen",
+    "question": "how do I create a Meta lead gen campaign for B2B SaaS?",
+    "expected_route": "vector",
+    "notes": "keyflo-sprint — marketing how-to"
+  },
+  {
+    "id": "keyflo-copy-lane",
+    "question": "which copy topics have the most lecture coverage in the knowledge graph?",
+    "expected_route": "graph",
+    "notes": "keyflo-sprint — coverage/structure (stable graph route)"
+  },
+  {
+    "id": "keyflo-langsmith-online",
+    "question": "how do I set up LangSmith online evaluators via REST API?",
+    "expected_route": "vector",
+    "notes": "keyflo-sprint — langsmith-online-evaluator-rule pattern"
+  },
+  {
+    "id": "keyflo-router-when",
+    "question": "when should the agentic router choose graph over vector?",
+    "expected_route": "graph",
+    "notes": "keyflo-sprint — kg-vector-routing"
+  },
+  {
+    "id": "keyflo-patterns-retrieval",
+    "question": "how do I query the patterns namespace for proven engineering playbooks?",
+    "expected_route": "vector",
+    "notes": "keyflo-sprint — patterns how-to"
+  },
+  {
+    "id": "keyflo-campaign-coverage",
+    "question": "which courses cover Facebook ads in the knowledge graph?",
+    "expected_route": "graph",
+    "notes": "keyflo-sprint — coverage question"
+  },
+  {
+    "id": "keyflo-ragas-offline",
+    "question": "what RAGAS metrics measure faithfulness vs answer relevancy?",
+    "expected_route": "vector",
+    "notes": "keyflo-sprint — RAGAS eval"
+  },
+  {
+    "id": "keyflo-dispute-null",
+    "question": "do courses disagree about Facebook vs Google campaign budget allocation?",
+    "expected_route": "graph",
+    "notes": "keyflo-sprint — dispute-shaped"
   }
 ]

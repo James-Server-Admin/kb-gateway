@@ -1,28 +1,20 @@
 #!/usr/bin/env bash
 # Ensure LangSmith online evaluator scopes to kb-gateway MCP runs (W11).
-# Updates existing Correctness rule filter if present; else prints manual steps.
+# Idempotent: apply_rule.py create-or-updates Correctness rule from template.
 set -euo pipefail
 
-LC="/root/langchain-course"
+TEMPLATE_ROOT="/mnt/blockstorage/business/Keyflo_AI/08_Development/langsmith-platform-template"
 PROJECT="${LANGSMITH_PROJECT:-LANGCHAIN-APP}"
-PROD_CHAINS='["retrieval_chain_without_lcel", "retrieval_chain_with_lcel", "namespace_rag_query", "course_rag_agent", "course_rag_target", "reflection_agent"]'
-FILTER="and(eq(is_root, true), or(and(eq(metadata.environment, \"production\"), in(name, ${PROD_CHAINS})), eq(metadata.surface, \"mcp\")))"
+ACCOUNT="${LANGSMITH_ACCOUNT:-learning}"
 
-cd "$LC"
+cd "$TEMPLATE_ROOT"
 source /mnt/blockstorage/env/load.sh global 2>/dev/null || true
+[[ "$ACCOUNT" == "keyflo" ]] && source /mnt/blockstorage/env/load.sh keyflo 2>/dev/null || true
 
-if ! ./run scripts/manage_online_evaluator_rule.py list --project "$PROJECT" 2>/dev/null | grep -q Correctness; then
-  echo "No Correctness rule in $PROJECT — create in LangSmith UI with filter:"
-  echo "  $FILTER"
-  echo "  sampling_rate: 0.1"
-  exit 0
-fi
-
-echo "Updating Correctness rule filter for MCP surface..."
-./run scripts/manage_online_evaluator_rule.py update \
+echo "Applying correctness-mcp-surface → $PROJECT (account=$ACCOUNT)"
+python3 scripts/apply_rule.py apply correctness-mcp-surface \
+  --account "$ACCOUNT" \
   --project "$PROJECT" \
-  --name Correctness \
-  --sampling-rate 0.1 \
-  --filter "$FILTER"
+  --var "surface=mcp"
 
-echo "Done. Verify in LangSmith → $PROJECT → Evaluators"
+echo "Done. Verify: python3 scripts/apply_rule.py list --account $ACCOUNT --project $PROJECT"
