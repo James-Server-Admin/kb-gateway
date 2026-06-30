@@ -16,6 +16,32 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_CASES = ROOT / "eval/retrieval_contract_cases.json"
 WRAPPER = Path("/root/.claude/skills/_shared/learning-kb-query.sh")
+EXECUTABLE_SURFACES = {
+    "local-wrapper",
+    "graph-required",
+    "namespace-or-query_all",
+    "targeted",
+    "local-wrapper-first",
+}
+STATIC_CONTRACT_FILES = [
+    Path("/root/AGENTS.md"),
+    Path("/root/.codex/AGENTS.md"),
+    Path("/root/.claude/CLAUDE.md"),
+    Path("/root/.cursor/rules/learning-kb-first.mdc"),
+    Path("/root/.gemini/GEMINI.md"),
+    Path("/root/.claude/skills/learning-kb/SKILL.md"),
+    Path("/root/.claude/skills/learning-kb/references/kb-tools.md"),
+    Path("/mnt/blockstorage/prompts/knowledge/learning-kb.prompt.md"),
+    Path("/mnt/blockstorage/prompts/knowledge/learning-kb-agent-handoff.prompt.md"),
+    ROOT / "README.md",
+    ROOT / "CLAUDE.md",
+    ROOT / "docs/ENDPOINT-CATALOG.md",
+    ROOT / "RUNBOOK.md",
+    ROOT / "kb_gateway/server.py",
+    ROOT / "kb_gateway/tools.py",
+    ROOT / "kb_gateway/config.py",
+    Path("/mnt/blockstorage/business/Keyflo_AI/08_Development/knowledge-base/AGENTS.md"),
+]
 
 
 def run_wrapper(question: str, graph: bool = False, timeout: int = 90) -> tuple[int, str]:
@@ -48,6 +74,21 @@ def check_case(row: dict, output: str, rc: int) -> list[str]:
     return failures
 
 
+def static_contract_text() -> str:
+    chunks: list[str] = []
+    for path in STATIC_CONTRACT_FILES:
+        if path.exists():
+            chunks.append(f"\n--- {path} ---\n{path.read_text(errors='replace')}")
+    return "\n".join(chunks)
+
+
+def run_case(row: dict, static_text: str) -> tuple[int, str]:
+    if row["surface"] in EXECUTABLE_SURFACES:
+        graph = row["surface"] == "graph-required"
+        return run_wrapper(row["input_text"], graph=graph)
+    return 0, static_text
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--cases", type=Path, default=DEFAULT_CASES)
@@ -57,26 +98,23 @@ def main() -> int:
     args = parser.parse_args()
 
     rows = json.loads(args.cases.read_text())
-    executable_rows = [
-        row for row in rows
-        if row["surface"] in {"local-wrapper", "graph-required", "namespace-or-query_all", "targeted", "local-wrapper-first"}
-    ]
     if args.ids:
         selected = [row for row in rows if row["id"] in set(args.ids)]
     elif args.all:
-        selected = executable_rows
+        selected = rows
     else:
+        executable_rows = [row for row in rows if row["surface"] in EXECUTABLE_SURFACES]
         selected = executable_rows[: args.limit]
 
     if not WRAPPER.exists():
         print(f"FAIL wrapper missing: {WRAPPER}")
         return 1
 
+    static_text = static_contract_text()
     passed = failed = 0
     for row in selected:
-        graph = row["surface"] == "graph-required"
         try:
-            rc, out = run_wrapper(row["input_text"], graph=graph)
+            rc, out = run_case(row, static_text)
         except subprocess.TimeoutExpired:
             print(f"FAIL {row['id']} timeout")
             failed += 1

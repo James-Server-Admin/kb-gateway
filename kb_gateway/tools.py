@@ -11,13 +11,62 @@ from .lc_bootstrap import ensure_langchain_course
 from .observability import instrument_tool
 
 
+def _refused(structured_response: Any) -> bool:
+    return bool(isinstance(structured_response, dict) and structured_response.get("refused"))
+
+
+def _with_retrieval_status(result: dict[str, Any], *, surface: str) -> dict[str, Any]:
+    """Prevent one-surface retrieval failures from becoming absence claims."""
+    out = dict(result)
+    source_documents = out.get("source_documents") or []
+    graph_context = (out.get("graph_context") or "").strip()
+    errors = out.get("errors") or {}
+    no_evidence = not source_documents and not graph_context
+    if no_evidence or _refused(out.get("structured_response")):
+        original_answer = out.get("answer")
+        out["retrieval_status"] = "indeterminate"
+        out["original_answer"] = original_answer
+        out["answer"] = (
+            f"{surface} returned no usable evidence for this query scope. Do not treat "
+            "this as proof that the learning KB lacks coverage; run/verify full-corpus "
+            "vector retrieval plus graph/tooling-health checks before making an absence claim."
+        )
+    elif errors:
+        out["retrieval_status"] = "partial"
+    else:
+        out["retrieval_status"] = "ok"
+    if errors:
+        out["errors"] = errors
+    return out
+
+
 @instrument_tool("route_query")
 def route_query(question: str, k: int = 6, max_retries: int = 2) -> dict[str, Any]:
     """Agentic router: auto-pick graph vs vector vs both."""
     ensure_langchain_course()
     from runtime.agentic_router import route_query as _rq
 
-    return _rq(question, k=k, max_retries=max_retries)
+    return _with_retrieval_status(_rq(question, k=k, max_retries=max_retries), surface="route_query")
+
+
+@instrument_tool("query_all")
+def query_all(question: str, k: int = 8) -> dict[str, Any]:
+    """Core full-corpus RAG: course-transcripts + patterns + research-papers + langchain-docs
+    merged into one answer with namespace-tagged sources. Use for general research /
+    'what do we know about X' — it sees the WHOLE knowledge base, not one namespace."""
+    ensure_langchain_course()
+    from runtime.query import query_all as _qa
+
+    result = _qa(question, k=k)
+    return _with_retrieval_status({
+        "answer": result.get("answer"),
+        "context": result.get("context"),
+        "namespaces": result.get("namespaces"),
+        "per_namespace_counts": result.get("per_namespace_counts"),
+        "errors": result.get("errors") or {},
+        "source_documents": result.get("source_documents"),
+        "structured_response": result.get("structured_response"),
+    }, surface="query_all")
 
 
 @instrument_tool("query_namespace")
@@ -46,12 +95,12 @@ def query_namespace(
         rerank=rerank,
         use_grader=use_grader,
     )
-    return {
+    return _with_retrieval_status({
         "answer": result.get("answer"),
         "namespace": namespace,
         "source_documents": result.get("source_documents"),
         "structured_response": result.get("structured_response"),
-    }
+    }, surface=f"query_namespace:{namespace}")
 
 
 @instrument_tool("list_namespaces")

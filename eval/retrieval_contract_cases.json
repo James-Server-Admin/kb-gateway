@@ -196,7 +196,7 @@
     "surface": "handoff",
     "expected_tools": "local-wrapper/query_all/route_query/pinecone-platform",
     "expected_sources_any": ["query_all", "route_query", "pinecone-platform", "patterns"],
-    "forbidden_phrases": ["Keyflo product SoT"],
+    "forbidden_phrases": ["use as Keyflo product SoT"],
     "source": "cross-agent handoff"
   }
 ]

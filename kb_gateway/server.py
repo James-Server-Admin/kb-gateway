@@ -59,7 +59,7 @@ def build_mcp(*, enable_auth: bool | None = None) -> FastMCP:
 
     @mcp.tool()
     def query_all(question: str, k: int = 8) -> str:
-        """Full-corpus search: course-transcripts + patterns + research-papers (whitepapers)
+        """Core full-corpus search: course-transcripts + patterns + research-papers + langchain-docs
         merged into one answer with namespace-tagged sources. Prefer this for general research /
         'what do we know about X' — it sees the WHOLE knowledge base, not just one namespace."""
         return T.dumps(T.query_all(question, k=k))
