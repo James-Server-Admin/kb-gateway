@@ -5,7 +5,7 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
-DEFAULT_LC_REPO = "/root/langchain-course"
+DEFAULT_LC_REPO = "/root/kb-core"
 DEFAULT_HOST = "127.0.0.1"
 DEFAULT_PORT = 8790
 

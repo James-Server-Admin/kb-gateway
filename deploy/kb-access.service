@@ -8,6 +8,7 @@ Type=simple
 User=root
 WorkingDirectory=/mnt/blockstorage/business/Keyflo_AI/08_Development/kb-gateway
 Environment=PYTHONPATH=/mnt/blockstorage/business/Keyflo_AI/08_Development/kb-gateway
+Environment=LANGCHAIN_COURSE_REPO=/root/kb-core
 EnvironmentFile=/mnt/blockstorage/env/kb-access.env
 EnvironmentFile=/mnt/blockstorage/env/paperclip-notifier.env
 EnvironmentFile=/mnt/blockstorage/env/keyflo.env
