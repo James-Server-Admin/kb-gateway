@@ -26,18 +26,19 @@ from kb_gateway.config import (  # noqa: E402
     langchain_course_repo,
 )
 
-# The curated exposure set locked by kb-index-remediation DECISIONS.md D-005
-# (Q3 curated default). Changing this set is an operator-reviewed decision —
-# update the decision reference alongside the code.
+# The curated exposure set — the original 4 collaborator-safe namespaces.
+# The W_502 first draft expanded this to 7; reverted on review (PR #3 BLOCKER
+# 2026-07-02): gateway tokens are shared with external collaborators
+# (kb-access), and pinecone-platform / platform-fabric / orchestrations carry
+# infra SoT material that needs a not-yet-existing owner-only tier. Changing
+# this set is an operator-reviewed decision — update the decision reference
+# alongside the code.
 CURATED_ALLOWED = frozenset(
     {
         "patterns",
         "course-transcripts",
         "langchain-docs",
         "research-papers",
-        "pinecone-platform",
-        "platform-fabric",
-        "orchestrations",
     }
 )
 

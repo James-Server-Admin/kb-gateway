@@ -11,37 +11,44 @@ DEFAULT_PORT = 8790
 
 # Collaborator-safe Pinecone namespaces (fail-closed whitelist).
 #
-# This is the EXPOSURE list — what remote MCP clients may query. REGISTRATION
-# lives in kb-core config.py NAMESPACES. Every kb-core-registered namespace
-# must appear either here or in EXCLUDED_NAMESPACES below with a reason, so the
-# two lists can never silently diverge (enforced by
-# tests/test_namespace_whitelist.py; kb-index-remediation W_502, D-005 Q3).
+# This is the EXPOSURE list — the ARCHITECTURE.md L2 security boundary, not a
+# routing convenience: gateway tokens are shared with EXTERNAL collaborators
+# (kb-access: friends, Cole), so anything listed here is remote-visible.
+# REGISTRATION lives in kb-core config.py NAMESPACES. Every kb-core-registered
+# namespace must appear either here or in EXCLUDED_NAMESPACES below with a
+# reason, so the two lists can never silently diverge (enforced by
+# tests/test_namespace_whitelist.py; kb-index-remediation W_502).
 #
 # research-papers (added 2026-06-24): external whitepapers exposed through
 # query_all/query_namespace alongside the course corpus.
-# pinecone-platform / platform-fabric / orchestrations (added 2026-07-02,
-# W_502): platform-template SoT + orchestration audit trail. Global CLAUDE.md
-# routes Pinecone template questions through this gateway (`pinecone-platform`
-# + `patterns`), so these must be MCP-visible.
 ALLOWED_NAMESPACES = frozenset(
     {
         "patterns",
         "course-transcripts",
         "langchain-docs",
         "research-papers",
-        "pinecone-platform",
-        "platform-fabric",
-        "orchestrations",
     }
 )
 
+# Shared rationale for the three namespaces the W_502 first draft wrongly
+# exposed (reverted on review).
+_PENDING_OWNER_TIER = (
+    "PENDING operator access-tier decision (PR #3 review BLOCKER 2026-07-02): "
+    "contains infra runbooks/registry SoT/execution-routine material; gateway "
+    "tokens are shared with external collaborators (kb-access) — exposure "
+    "requires role-gated namespaces (owner-only tier) which does not exist yet."
+)
+
 # Registered in kb-core config.py NAMESPACES but intentionally NOT exposed to
-# remote clients (kb-index-remediation W_502 / DECISIONS.md D-005 — Q3 curated
-# default). One line per exclusion with WHY; move a namespace to
-# ALLOWED_NAMESPACES only with an operator-reviewed PR.
+# remote clients (kb-index-remediation W_502). One entry per exclusion with
+# WHY; move a namespace to ALLOWED_NAMESPACES only with an operator-reviewed
+# PR.
 EXCLUDED_NAMESPACES: dict[str, str] = {
     "course-code": "24 vectors of repo scripts/notebooks — low value via MCP",
     "own-notes": "personal operator notes (18 vectors) — not collaborator-safe",
+    "orchestrations": _PENDING_OWNER_TIER,
+    "pinecone-platform": _PENDING_OWNER_TIER,
+    "platform-fabric": _PENDING_OWNER_TIER,
     "github-platform": "platform template — queryable via github-platform-bootstrap",
     "langsmith-platform": "platform template — queryable via langsmith-platform-bootstrap",
     "neo4j-platform": "platform template — queryable via neo4j-platform-bootstrap",
