@@ -28,3 +28,5 @@ See also [`AGENTS.md`](../AGENTS.md) · corpus pattern: `langchain-course/patter
 `patterns` · `course-transcripts` · `langchain-docs` · `research-papers`
 
 Never expose `own-notes` / `orchestrations` via this gateway.
+
+Enforcement home: `ALLOWED_NAMESPACES` in `kb_gateway/config.py` — every other registered namespace is documented with its exclusion reason beside it in `EXCLUDED_NAMESPACES` (tested by `tests/test_namespace_whitelist.py`).

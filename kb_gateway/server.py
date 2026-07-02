@@ -6,10 +6,14 @@ from mcp.server.auth.settings import AuthSettings
 from mcp.server.fastmcp import FastMCP
 
 from .auth import StaticTokenVerifier
-from .config import api_tokens, gateway_host, gateway_port, public_url
+from .config import ALLOWED_NAMESPACES, api_tokens, gateway_host, gateway_port, public_url
 from . import tools as T
 
-INSTRUCTIONS = """
+# Derived from the enforcement list so tool docs can never drift from what the
+# gateway actually allows (PR #3 review finding 3).
+_NS_ENUM = " | ".join(sorted(ALLOWED_NAMESPACES))
+
+INSTRUCTIONS = f"""
 James learning KB gateway. Exposes read-mostly access to the learning corpus:
 Pinecone vector index `learning` + Neo4j knowledge graph + agentic router.
 
@@ -17,7 +21,7 @@ WHEN TO USE WHICH TOOL:
 - answer_learning_kb — canonical structured answer wrapper; use first when you want a stable response contract
 - query_all — default for broad research / "what do we know" / full-corpus synthesis
 - route_query — use when graph-vs-vector routing is ambiguous or structural claims matter
-- query_namespace — semantic/how-to when you know you need passages (patterns | course-transcripts | langchain-docs | research-papers)
+- query_namespace — semantic/how-to when you know you need passages ({_NS_ENUM})
 - graph_query — coverage, topic depth, disputes (mode: stats | lane | topics | disputes)
 - list_namespaces — discover corpora
 - health — dependency check
@@ -79,21 +83,25 @@ def build_mcp(*, enable_auth: bool | None = None) -> FastMCP:
         """Classify and answer using agentic router (graph | vector | both). Use when routing is ambiguous."""
         return T.dumps(T.route_query(question, k=k, max_retries=max_retries))
 
-    @mcp.tool()
+    @mcp.tool(
+        description=(
+            f"Core full-corpus search: {' + '.join(sorted(ALLOWED_NAMESPACES))} "
+            "merged into one answer with namespace-tagged sources. Prefer this for general research / "
+            "'what do we know about X' — it sees the WHOLE knowledge base, not just one namespace."
+        )
+    )
     def query_all(question: str, k: int = 8) -> str:
-        """Core full-corpus search: course-transcripts + patterns + research-papers + langchain-docs
-        merged into one answer with namespace-tagged sources. Prefer this for general research /
-        'what do we know about X' — it sees the WHOLE knowledge base, not just one namespace."""
         return T.dumps(T.query_all(question, k=k))
 
-    @mcp.tool()
+    @mcp.tool(
+        description=f"Semantic RAG against whitelisted namespace: {_NS_ENUM}."
+    )
     def query_namespace(
         question: str,
         namespace: str = "patterns",
         k: int = 4,
         rerank: bool = False,
     ) -> str:
-        """Semantic RAG against whitelisted namespace: patterns | course-transcripts | langchain-docs | research-papers."""
         return T.dumps(T.query_namespace(question, namespace=namespace, k=k, rerank=rerank))
 
     @mcp.tool()

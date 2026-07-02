@@ -1,7 +1,7 @@
 # Endpoint catalog — learning KB
 
 **Audience:** Coding agents (Cursor, Claude, CI, custom apps)  
-**Last verified:** 2026-06-19 (live Pinecone + Neo4j stats)  
+**Inventory note:** namespace/vector counts drift — authoritative source: `list_namespaces` (remote) / Pinecone `describe_index_stats` (operator). Namespace roster as sampled 2026-07-02; Neo4j stats as sampled 2026-06-19.  
 **Canonical doc:** this file · **Routing:** [`routing.md`](routing.md) · **MCP setup:** [`COLE-SETUP.md`](COLE-SETUP.md)
 
 Use this catalog to pick the **right surface and tool** without guessing. Default single-shot answer surface: **`answer_learning_kb`**. Use **`query_all`** for direct full-corpus retrieval and **`route_query`** when graph-vs-vector routing is uncertain or structural claims matter.
@@ -12,18 +12,27 @@ Use this catalog to pick the **right surface and tool** without guessing. Defaul
 
 ### Pinecone index `learning`
 
-| Namespace | Vectors | Remote MCP | Doc type | Use for |
-|-----------|---------|------------|----------|---------|
-| `course-transcripts` | 92,420 | ✅ | transcript | Course lectures across business, tech, finance, creative, ops, engineering, marketing, and more (116 courses) |
-| `langchain-docs` | 1,150 | ✅ | docs | LangChain / LangGraph / LangSmith official docs |
-| `patterns` | 372 | ✅ | pattern | Proven process patterns (`patterns/*.md`) |
-| `research-papers` | varies | ✅ | paper | External research papers / whitepapers |
-| `course-code` | 24 | ❌ | code | langchain-course scripts/notebooks (operator only) |
-| `orchestrations` | 151 | ❌ | orchestration | Codex/grok run syntheses (operator only) |
-| `own-notes` | 18 | ❌ | notes | James operator notes (operator only) |
+| Namespace | Remote MCP | Doc type | Use for |
+|-----------|------------|----------|---------|
+| `course-transcripts` | ✅ | transcript | Course lectures across business, tech, finance, creative, ops, engineering, marketing, and more (116 courses) |
+| `langchain-docs` | ✅ | docs | LangChain / LangGraph / LangSmith official docs |
+| `patterns` | ✅ | pattern | Proven process patterns (`patterns/*.md`) |
+| `research-papers` | ✅ | paper | External research papers / whitepapers |
+| `pinecone-platform` | ❌ | pattern | Pinecone platform template SoT — pending operator access-tier decision (see `EXCLUDED_NAMESPACES`) |
+| `platform-fabric` | ❌ | pattern | Platform Fabric unification layer — pending operator access-tier decision (see `EXCLUDED_NAMESPACES`) |
+| `orchestrations` | ❌ | orchestration | Codex/grok run syntheses — pending operator access-tier decision (see `EXCLUDED_NAMESPACES`) |
+| `course-code` | ❌ | code | kb-core scripts/notebooks (operator only) |
+| `own-notes` | ❌ | notes | James operator notes (operator only) |
+| `github-platform` | ❌ | pattern | Platform template — use `github-platform-bootstrap` instead |
+| `langsmith-platform` | ❌ | pattern | Platform template — use `langsmith-platform-bootstrap` instead |
+| `neo4j-platform` | ❌ | pattern | Platform template — use `neo4j-platform-bootstrap` instead |
+| `keyflo-copy-eval-feedback` | ❌ | lesson | Keyflo product-eval store, not learning KB |
+| `pinecone-platform-smoke` | ❌ | bootstrap_record | Smoke-test artifacts (verification residue) |
+
+> Counts intentionally omitted — they drift; query `list_namespaces` / `describe_index_stats` for live numbers. General note: the live `course-transcripts` namespace currently includes duplicate embedding generations pending kb-index-remediation cleanup (W_304/W_305 delete gates), so raw counts overstate distinct content.
 
 - **Embedding:** `text-embedding-3-large` · 3072-dim (immutable)  
-- **Remote whitelist:** `patterns`, `course-transcripts`, `langchain-docs`, `research-papers` (`kb_gateway/config.py`)
+- **Remote whitelist:** `patterns`, `course-transcripts`, `langchain-docs`, `research-papers` — enforced by `ALLOWED_NAMESPACES` in `kb_gateway/config.py`; exclusions documented beside it in `EXCLUDED_NAMESPACES`
 
 ### Neo4j graph `learning-kg-neo4j`
 

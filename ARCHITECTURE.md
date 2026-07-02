@@ -43,7 +43,7 @@ flowchart LR
 ## Security boundaries
 
 - L1: Bearer token on HTTP MCP
-- L2: Namespace whitelist (no own-notes/orchestrations)
+- L2: Namespace whitelist (no own-notes/orchestrations) — enforced by `ALLOWED_NAMESPACES` in `kb_gateway/config.py`; every other registered namespace carries a documented exclusion reason in `EXCLUDED_NAMESPACES` beside it
 - L3: Neo4j read-only Cypher guard + no direct bolt exposure
 - L4: Pinecone keys never leave server
 
