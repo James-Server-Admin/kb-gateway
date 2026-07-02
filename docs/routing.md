@@ -25,6 +25,6 @@ See also [`AGENTS.md`](../AGENTS.md) · corpus pattern: `langchain-course/patter
 
 ## Allowed Pinecone namespaces (remote)
 
-`patterns` · `course-transcripts` · `langchain-docs` · `research-papers`
+`patterns` · `course-transcripts` · `langchain-docs` · `research-papers` · `pinecone-platform` · `platform-fabric` · `orchestrations`
 
-Never expose `own-notes` / `orchestrations` via this gateway.
+Never expose `own-notes`, `course-code`, `keyflo-copy-eval-feedback`, `pinecone-platform-smoke`, or the platform bootstrap template namespaces (`github-platform` / `langsmith-platform` / `neo4j-platform`) via this gateway — exclusion reasons live beside the whitelist in `kb_gateway/config.py` (`EXCLUDED_NAMESPACES`).

@@ -76,7 +76,7 @@ curl -s -o /dev/null -w "%{http_code}\n" \
 |------|----------|
 | `query_all` | **Default for broad research** / "what do we know about X" |
 | `route_query` | Not sure whether graph, vector, or both are needed |
-| `query_namespace` | How-to / passages (`course-transcripts`, `patterns`, `langchain-docs`, `research-papers`) |
+| `query_namespace` | How-to / passages (`course-transcripts`, `patterns`, `langchain-docs`, `research-papers`, `pinecone-platform`, `platform-fabric`, `orchestrations`) |
 | `graph_query` | Coverage, topic depth, cross-course disputes |
 | `list_namespaces` | See what's in the corpus |
 | `health` | Check the service is up |

@@ -39,7 +39,7 @@ Remote agents call MCP tools instead of holding Pinecone/Neo4j credentials:
 | `answer_learning_kb` | **Canonical structured answer** — stable wrapper over routing/full-corpus retrieval with sanitized evidence |
 | `query_all` | **Default for broad research** — full-corpus search with namespace-tagged sources |
 | `route_query` | Use when graph vs vector routing matters, or the question is structural/ambiguous |
-| `query_namespace` | Semantic RAG (`patterns`, `course-transcripts`, `langchain-docs`, `research-papers`) |
+| `query_namespace` | Semantic RAG (`patterns`, `course-transcripts`, `langchain-docs`, `research-papers`, `pinecone-platform`, `platform-fabric`, `orchestrations`) |
 | `graph_query` | Neo4j coverage / disputes / topic depth |
 | `list_namespaces` | Corpus inventory |
 | `health` | Dependency check |

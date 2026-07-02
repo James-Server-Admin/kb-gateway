@@ -1,7 +1,7 @@
 # Endpoint catalog — learning KB
 
 **Audience:** Coding agents (Cursor, Claude, CI, custom apps)  
-**Last verified:** 2026-06-19 (live Pinecone + Neo4j stats)  
+**Last verified:** 2026-07-02 (live Pinecone stats; Neo4j stats 2026-06-19)  
 **Canonical doc:** this file · **Routing:** [`routing.md`](routing.md) · **MCP setup:** [`COLE-SETUP.md`](COLE-SETUP.md)
 
 Use this catalog to pick the **right surface and tool** without guessing. Default single-shot answer surface: **`answer_learning_kb`**. Use **`query_all`** for direct full-corpus retrieval and **`route_query`** when graph-vs-vector routing is uncertain or structural claims matter.
@@ -14,16 +14,25 @@ Use this catalog to pick the **right surface and tool** without guessing. Defaul
 
 | Namespace | Vectors | Remote MCP | Doc type | Use for |
 |-----------|---------|------------|----------|---------|
-| `course-transcripts` | 92,420 | ✅ | transcript | Course lectures across business, tech, finance, creative, ops, engineering, marketing, and more (116 courses) |
+| `course-transcripts` | 283,097¹ | ✅ | transcript | Course lectures across business, tech, finance, creative, ops, engineering, marketing, and more (116 courses) |
 | `langchain-docs` | 1,150 | ✅ | docs | LangChain / LangGraph / LangSmith official docs |
-| `patterns` | 372 | ✅ | pattern | Proven process patterns (`patterns/*.md`) |
-| `research-papers` | varies | ✅ | paper | External research papers / whitepapers |
-| `course-code` | 24 | ❌ | code | langchain-course scripts/notebooks (operator only) |
-| `orchestrations` | 151 | ❌ | orchestration | Codex/grok run syntheses (operator only) |
+| `patterns` | 435 | ✅ | pattern | Proven process patterns (`patterns/*.md`) |
+| `research-papers` | 253 | ✅ | paper | External research papers / whitepapers |
+| `pinecone-platform` | 12 | ✅ | pattern | Pinecone platform template progressive SoT |
+| `platform-fabric` | 13 | ✅ | pattern | Platform Fabric unification layer (PLATFORM-REGISTRY, scope ontology, execution routine) |
+| `orchestrations` | 151 | ✅ | orchestration | Codex/grok run syntheses (audit trail) |
+| `course-code` | 24 | ❌ | code | kb-core scripts/notebooks (operator only) |
 | `own-notes` | 18 | ❌ | notes | James operator notes (operator only) |
+| `github-platform` | 10 | ❌ | pattern | Platform template — use `github-platform-bootstrap` instead |
+| `langsmith-platform` | 8 | ❌ | pattern | Platform template — use `langsmith-platform-bootstrap` instead |
+| `neo4j-platform` | 6 | ❌ | pattern | Platform template — use `neo4j-platform-bootstrap` instead |
+| `keyflo-copy-eval-feedback` | 8 | ❌ | lesson | Keyflo product-eval store, not learning KB |
+| `pinecone-platform-smoke` | 1 | ❌ | bootstrap_record | Smoke-test artifacts (verification residue) |
+
+¹ Live count includes duplicate embedding generations pending kb-index-remediation cleanup (W_304/W_305 delete gates).
 
 - **Embedding:** `text-embedding-3-large` · 3072-dim (immutable)  
-- **Remote whitelist:** `patterns`, `course-transcripts`, `langchain-docs`, `research-papers` (`kb_gateway/config.py`)
+- **Remote whitelist:** `patterns`, `course-transcripts`, `langchain-docs`, `research-papers`, `pinecone-platform`, `platform-fabric`, `orchestrations` (`kb_gateway/config.py`; exclusions documented beside it in `EXCLUDED_NAMESPACES`)
 
 ### Neo4j graph `learning-kg-neo4j`
 
@@ -61,10 +70,13 @@ Question?
 ├─ Broad research / "what do we know?" ──────► query_all
 ├─ Unsure vector vs graph? ──────────────────► route_query
 ├─ How-to / passages / "explain X"? ─────────► query_namespace (pick namespace)
-│   ├─ course material ──► course-transcripts
-│   ├─ process/SOP ──────► patterns
-│   ├─ LangChain stack ──► langchain-docs
-│   └─ external papers ──► research-papers
+│   ├─ course material ──────► course-transcripts
+│   ├─ process/SOP ──────────► patterns
+│   ├─ LangChain stack ──────► langchain-docs
+│   ├─ external papers ──────► research-papers
+│   ├─ Pinecone DB templates ► pinecone-platform (+ patterns)
+│   ├─ platform fabric SoT ──► platform-fabric
+│   └─ orchestration runs ───► orchestrations
 ├─ Which courses cover X? / depth / lanes? ──► graph_query (mode=topics|lane|stats)
 ├─ Do courses disagree? ─────────────────────► graph_query (mode=disputes) or route_query
 └─ What can I query? ────────────────────────► list_namespaces or graph_query (mode=stats)
@@ -98,7 +110,7 @@ Each entry follows the **endpoint card** template in [§7](#7-endpoint-card-temp
 | **Request** | `question: string`, `intent: auto|broad|structural`, `k: 1-12`, `max_retries`, optional `namespace`, `include_raw` |
 | **Response** | `{ surface, tool_used, question, answer, retrieval_status, access, routing, evidence, cautions, next_steps }` |
 | **Access behavior** | Collaborators get sanitized source metadata. Owner/local clients may opt into `raw_result` with `include_raw=true`. |
-| **Limits** | Question max 4000 chars. Allowed namespaces only: `patterns`, `course-transcripts`, `langchain-docs`, `research-papers`. |
+| **Limits** | Question max 4000 chars. Allowed namespaces only: `patterns`, `course-transcripts`, `langchain-docs`, `research-papers`, `pinecone-platform`, `platform-fabric`, `orchestrations`. |
 | **Example** | `answer_learning_kb("what do we know about PAS copy structure?", intent="auto")` |
 | **Composes with** | Direct tools when an agent needs lower-level graph/vector debugging. |
 
@@ -163,7 +175,7 @@ False no-context rule: one empty namespace, vector, router, or tool-error result
 | **When to use** | Passage retrieval when namespace is known. |
 | **When NOT** | Coverage counts, disputes, "which courses" — use `graph_query` or `route_query`. |
 | **Request** | `question: str` · `namespace: str` default `patterns` · `k: int` default 4 · `rerank: bool` default false |
-| **Namespace enum** | `patterns` \| `course-transcripts` \| `langchain-docs` \| `research-papers` |
+| **Namespace enum** | `patterns` \| `course-transcripts` \| `langchain-docs` \| `research-papers` \| `pinecone-platform` \| `platform-fabric` \| `orchestrations` |
 | **Response** | `{ answer, namespace, source_documents[], structured_response? }` |
 | **Example** | `query_namespace("Facebook ads campaign structure", namespace="course-transcripts", k=8)` |
 
@@ -293,6 +305,9 @@ False no-context rule: one empty namespace, vector, router, or tool-error result
    - LangChain implementation → `query_namespace(..., namespace="langchain-docs")`  
    - External papers / whitepapers → `query_namespace(..., namespace="research-papers")`  
    - Process/SOP from patterns → `query_namespace(..., namespace="patterns")`  
+   - Pinecone DB best-practice/template → `query_namespace(..., namespace="pinecone-platform")` plus `patterns`  
+   - Platform fabric / registry / execution routine → `query_namespace(..., namespace="platform-fabric")`  
+   - Prior orchestration runs / audit trail → `query_namespace(..., namespace="orchestrations")`  
    - Marketing depth inventory → `graph_query(mode="lane", lane="copy"|"design"|"campaign"|"tracking")`  
    - Topic coverage → `graph_query(mode="topics", topics="...")`  
 4. **Synthesize:** Merge `graph_context` (structure) + `answer` (passages). Cite `source_documents`.  
