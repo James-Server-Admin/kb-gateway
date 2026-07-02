@@ -83,11 +83,14 @@ def build_mcp(*, enable_auth: bool | None = None) -> FastMCP:
         """Classify and answer using agentic router (graph | vector | both). Use when routing is ambiguous."""
         return T.dumps(T.route_query(question, k=k, max_retries=max_retries))
 
-    @mcp.tool()
+    @mcp.tool(
+        description=(
+            f"Core full-corpus search: {' + '.join(sorted(ALLOWED_NAMESPACES))} "
+            "merged into one answer with namespace-tagged sources. Prefer this for general research / "
+            "'what do we know about X' — it sees the WHOLE knowledge base, not just one namespace."
+        )
+    )
     def query_all(question: str, k: int = 8) -> str:
-        """Core full-corpus search: course-transcripts + patterns + research-papers + langchain-docs
-        merged into one answer with namespace-tagged sources. Prefer this for general research /
-        'what do we know about X' — it sees the WHOLE knowledge base, not just one namespace."""
         return T.dumps(T.query_all(question, k=k))
 
     @mcp.tool(

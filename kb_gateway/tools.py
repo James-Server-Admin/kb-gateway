@@ -255,9 +255,11 @@ def answer_learning_kb(
 
 @instrument_tool("query_all")
 def query_all(question: str, k: int = 8) -> dict[str, Any]:
-    """Core full-corpus RAG: course-transcripts + patterns + research-papers + langchain-docs
-    merged into one answer with namespace-tagged sources. Use for general research /
-    'what do we know about X' — it sees the WHOLE knowledge base, not one namespace."""
+    """Core full-corpus RAG across the allowed corpus namespaces (see
+    config.ALLOWED_NAMESPACES — no hardcoded list so docs cannot drift from
+    enforcement), merged into one answer with namespace-tagged sources. Use for
+    general research / 'what do we know about X' — it sees the WHOLE knowledge
+    base, not one namespace."""
     ensure_langchain_course()
     from runtime.query import query_all as _qa
 
