@@ -9,6 +9,7 @@ from .config import ALLOWED_NAMESPACES
 from . import graph as kg
 from .context import get_client
 from .lc_bootstrap import ensure_langchain_course
+from .dispute_answer import apply_dispute_first_answer
 from .observability import instrument_tool
 
 OWNER_CLIENTS = frozenset({"operator", "local", "owner", "james"})
@@ -221,12 +222,15 @@ def answer_learning_kb(
     else:
         result = query_all(q, k=k)
 
+    graph_context = (result.get("graph_context") or "").strip()
+    answer = apply_dispute_first_answer(result.get("answer"), graph_context)
+
     source_documents = result.get("source_documents") or []
     response: dict[str, Any] = {
         "surface": "answer_learning_kb",
         "tool_used": tool_used,
         "question": q,
-        "answer": result.get("answer"),
+        "answer": answer,
         "retrieval_status": result.get("retrieval_status", "ok"),
         "access": access,
         "routing": {
@@ -252,7 +256,6 @@ def answer_learning_kb(
     errors = result.get("errors")
     if errors:
         response["errors"] = errors
-    graph_context = (result.get("graph_context") or "").strip()
     if graph_context:
         response["graph_context"] = graph_context
     if include_raw and access["raw_evidence_allowed"]:
