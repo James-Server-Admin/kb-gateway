@@ -81,7 +81,8 @@ def _pick_surface(question: str, intent: str, namespace: str | None) -> str:
     q = question.lower()
     if any(hint in q for hint in STRUCTURAL_HINTS):
         return "route_query"
-    return "query_all"
+    # Route-first default (W1.1): auto intent tries agentic_router before vector.
+    return "route_query"
 
 
 def _source_value(doc: Any, key: str) -> Any:
@@ -203,17 +204,27 @@ def answer_learning_kb(
 
     access = _client_access()
     surface = _pick_surface(q, intent, namespace)
+    degradation: str | None = None
+    tool_used = surface
     if surface == "query_namespace":
         result = query_namespace(q, namespace=namespace or "patterns", k=k)
     elif surface == "route_query":
-        result = route_query(q, k=k, max_retries=max_retries)
+        try:
+            result = route_query(q, k=k, max_retries=max_retries)
+        except Exception as exc:
+            degradation = "route_query_fallback"
+            tool_used = "query_all"
+            result = query_all(q, k=k)
+            route_errors = dict(result.get("errors") or {})
+            route_errors["route_query"] = f"{type(exc).__name__}: {exc}"
+            result = {**result, "errors": route_errors}
     else:
         result = query_all(q, k=k)
 
     source_documents = result.get("source_documents") or []
     response: dict[str, Any] = {
         "surface": "answer_learning_kb",
-        "tool_used": surface,
+        "tool_used": tool_used,
         "question": q,
         "answer": result.get("answer"),
         "retrieval_status": result.get("retrieval_status", "ok"),
@@ -223,6 +234,7 @@ def answer_learning_kb(
             "route": result.get("route"),
             "route_reason": result.get("route_reason"),
             "namespace": result.get("namespace") or namespace,
+            **({"degradation": degradation} if degradation else {}),
         },
         "evidence": {
             "source_count": len(source_documents) if isinstance(source_documents, list) else 0,
