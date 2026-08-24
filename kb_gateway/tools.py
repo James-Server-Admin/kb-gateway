@@ -12,20 +12,26 @@ from .lc_bootstrap import ensure_langchain_course
 from .observability import instrument_tool
 
 OWNER_CLIENTS = frozenset({"operator", "local", "owner", "james"})
-STRUCTURAL_HINTS = (
-    "which course",
-    "which courses",
-    "where is",
-    "coverage",
-    "covered",
-    "topic depth",
-    "disagree",
-    "disagreement",
-    "contradict",
-    "relationship",
-    "graph",
-    "compare",
+
+COURSE_DOMAIN_HINTS = (
+    "course",
+    "courses",
+    "lecture",
+    "lectures",
+    "module",
+    "modules",
+    "curriculum",
+    "instructor",
+    "transcript",
+    "transcripts",
+    "syllabus",
 )
+
+
+def _is_course_domain_question(question: str) -> bool:
+    q = question.lower()
+    return any(hint in q for hint in COURSE_DOMAIN_HINTS)
+
 
 
 def _refused(structured_response: Any) -> bool:
@@ -78,10 +84,12 @@ def _pick_surface(question: str, intent: str, namespace: str | None) -> str:
         return "route_query"
     if requested != "auto":
         raise ValueError("intent must be auto | broad | structural | routing | graph | coverage | disputes")
-    q = question.lower()
-    if any(hint in q for hint in STRUCTURAL_HINTS):
+    # F2 carve-out: route_query only when auto intent has course-domain positive signal.
+    # route_query's graph+vector arms are scoped to course-transcripts (kb-core NS constant).
+    if _is_course_domain_question(question):
         return "route_query"
     return "query_all"
+
 
 
 def _source_value(doc: Any, key: str) -> Any:
@@ -203,17 +211,38 @@ def answer_learning_kb(
 
     access = _client_access()
     surface = _pick_surface(q, intent, namespace)
+    degradation: str | None = None
+    tool_used = surface
     if surface == "query_namespace":
         result = query_namespace(q, namespace=namespace or "patterns", k=k)
     elif surface == "route_query":
-        result = route_query(q, k=k, max_retries=max_retries)
+        try:
+            result = route_query(q, k=k, max_retries=max_retries)
+            if result.get("retrieval_status") == "indeterminate":
+                degradation = "route_query_degraded_fallback"
+                tool_used = "query_all"
+                cause = (
+                    result.get("graph_facts_error")
+                    or "retrieval_status=indeterminate (no usable evidence)"
+                )
+                result = query_all(q, k=k)
+                route_errors = dict(result.get("errors") or {})
+                route_errors["route_query"] = cause
+                result = {**result, "errors": route_errors}
+        except Exception as exc:
+            degradation = "route_query_fallback"
+            tool_used = "query_all"
+            result = query_all(q, k=k)
+            route_errors = dict(result.get("errors") or {})
+            route_errors["route_query"] = f"{type(exc).__name__}: {exc}"
+            result = {**result, "errors": route_errors}
     else:
         result = query_all(q, k=k)
 
     source_documents = result.get("source_documents") or []
     response: dict[str, Any] = {
         "surface": "answer_learning_kb",
-        "tool_used": surface,
+        "tool_used": tool_used,
         "question": q,
         "answer": result.get("answer"),
         "retrieval_status": result.get("retrieval_status", "ok"),
@@ -223,6 +252,7 @@ def answer_learning_kb(
             "route": result.get("route"),
             "route_reason": result.get("route_reason"),
             "namespace": result.get("namespace") or namespace,
+            **({"degradation": degradation} if degradation else {}),
         },
         "evidence": {
             "source_count": len(source_documents) if isinstance(source_documents, list) else 0,
