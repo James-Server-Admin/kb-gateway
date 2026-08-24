@@ -13,6 +13,26 @@ from .observability import instrument_tool
 
 OWNER_CLIENTS = frozenset({"operator", "local", "owner", "james"})
 
+COURSE_DOMAIN_HINTS = (
+    "course",
+    "courses",
+    "lecture",
+    "lectures",
+    "module",
+    "modules",
+    "curriculum",
+    "instructor",
+    "transcript",
+    "transcripts",
+    "syllabus",
+)
+
+
+def _is_course_domain_question(question: str) -> bool:
+    q = question.lower()
+    return any(hint in q for hint in COURSE_DOMAIN_HINTS)
+
+
 
 def _refused(structured_response: Any) -> bool:
     return bool(isinstance(structured_response, dict) and structured_response.get("refused"))
@@ -54,7 +74,7 @@ def _client_access() -> dict[str, Any]:
     }
 
 
-def _pick_surface(_question: str, intent: str, namespace: str | None) -> str:
+def _pick_surface(question: str, intent: str, namespace: str | None) -> str:
     requested = (intent or "auto").strip().lower()
     if namespace:
         return "query_namespace"
@@ -64,8 +84,12 @@ def _pick_surface(_question: str, intent: str, namespace: str | None) -> str:
         return "route_query"
     if requested != "auto":
         raise ValueError("intent must be auto | broad | structural | routing | graph | coverage | disputes")
-    # Route-first default (W1.1): auto intent tries agentic_router before vector.
-    return "route_query"
+    # F2 carve-out: route_query only when auto intent has course-domain positive signal.
+    # route_query's graph+vector arms are scoped to course-transcripts (kb-core NS constant).
+    if _is_course_domain_question(question):
+        return "route_query"
+    return "query_all"
+
 
 
 def _source_value(doc: Any, key: str) -> Any:
