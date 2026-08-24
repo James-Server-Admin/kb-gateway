@@ -143,6 +143,19 @@ See `deploy/cloudflare-waf-rate-limit.md` · `./scripts/setup_cloudflare_rate_li
 
 Draft → `scripts/smoke_test.sh` → PR review → merge → `systemctl restart kb-gateway` → `./scripts/usage_report.sh 1`
 
+### Deploy-time artifacts (repoint / re-clone the router source)
+
+If `LANGCHAIN_COURSE_REPO` is ever repointed to a fresh clone (e.g. a dedicated deploy clone
+instead of a shared dev checkout — see `kb-gateway#6` activation 2026-08-24), the fresh clone will
+be missing gitignored, locally-derived cache files that `route_query`'s graph arm needs:
+`graph/out/_cache/{lectures.npy,lectures_meta.json}`. These are DEPLOY-TIME ARTIFACTS, not
+committed to git — carry them over (`cp -n` from the prior working tree) or rebuild them before
+the first live `route_query` call, otherwise the router degrades loudly (`routing.degradation`
+stamped, `errors.route_query` populated) rather than silently, per the F1 fix — a correct but
+avoidable degradation. Confirmed live during the `kb-gateway#12`/`kb-core#227` activation: first
+post-restart `route_query` call caught the missing cache and degraded loudly exactly as designed;
+copying the cache from the prior tree and re-probing cleared it (route `both`, zero degradation).
+
 ## 7. MCP config
 
 See `docs/COLE-SETUP.md` and `docs/client-setup.md`. Tokens in `learning-kb-api-keys.txt` + GH variables.
