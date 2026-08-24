@@ -51,7 +51,10 @@ def test_pick_surface_broad_stays_query_all():
     assert _pick_surface("anything", "full_corpus", None) == "query_all"
 
 
-def test_pick_surface_structural_hints_route_query():
+def test_pick_surface_structural_wording_still_route_query():
+    """F4: STRUCTURAL_HINTS branch was removed as dead code (both arms returned the same
+    value); this case keeps coverage that structural-shaped auto-intent wording still
+    routes to route_query via the unconditional fallthrough."""
     assert _pick_surface("which courses cover negotiation?", "auto", None) == "route_query"
 
 

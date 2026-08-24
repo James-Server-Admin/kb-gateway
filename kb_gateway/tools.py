@@ -12,20 +12,6 @@ from .lc_bootstrap import ensure_langchain_course
 from .observability import instrument_tool
 
 OWNER_CLIENTS = frozenset({"operator", "local", "owner", "james"})
-STRUCTURAL_HINTS = (
-    "which course",
-    "which courses",
-    "where is",
-    "coverage",
-    "covered",
-    "topic depth",
-    "disagree",
-    "disagreement",
-    "contradict",
-    "relationship",
-    "graph",
-    "compare",
-)
 
 
 def _refused(structured_response: Any) -> bool:
@@ -68,7 +54,7 @@ def _client_access() -> dict[str, Any]:
     }
 
 
-def _pick_surface(question: str, intent: str, namespace: str | None) -> str:
+def _pick_surface(_question: str, intent: str, namespace: str | None) -> str:
     requested = (intent or "auto").strip().lower()
     if namespace:
         return "query_namespace"
