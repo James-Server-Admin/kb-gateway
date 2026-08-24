@@ -126,3 +126,33 @@ def test_route_query_failure_negative_path_exercises_real_fallback(
     out = answer_learning_kb("fallback probe", intent="auto")
     assert out["routing"]["degradation"] == "route_query_fallback"
     assert out["access"]["role"] == "collaborator"
+
+
+_ROUTE_INDETERMINATE = {
+    "answer": "route_query returned no usable evidence for this query scope.",
+    "route": "graph",
+    "route_reason": "structural",
+    "graph_context": "",
+    "graph_facts_error": "ServiceUnavailable: Neo4j is down",
+    "source_documents": [],
+    "retrieval_status": "indeterminate",
+    "namespaces": [],
+    "per_namespace_counts": {},
+    "errors": {},
+}
+
+
+@patch("kb_gateway.tools.query_all", return_value=_QUERY_ALL_OK)
+@patch("kb_gateway.tools.route_query", return_value=_ROUTE_INDETERMINATE)
+def test_route_query_indeterminate_falls_back_with_degraded_degradation(
+    mock_route, mock_query_all
+):
+    """F1: successful route_query with indeterminate status must fall back to query_all."""
+    context.set_client("local")
+    out = answer_learning_kb("what is RAG?", intent="auto")
+    mock_route.assert_called_once()
+    mock_query_all.assert_called_once()
+    assert out["tool_used"] == "query_all"
+    assert out["routing"]["degradation"] == "route_query_degraded_fallback"
+    assert "route_query" in (out.get("errors") or {})
+    assert "ServiceUnavailable" in out["errors"]["route_query"]

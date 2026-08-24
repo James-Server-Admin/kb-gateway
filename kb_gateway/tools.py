@@ -78,9 +78,6 @@ def _pick_surface(question: str, intent: str, namespace: str | None) -> str:
         return "route_query"
     if requested != "auto":
         raise ValueError("intent must be auto | broad | structural | routing | graph | coverage | disputes")
-    q = question.lower()
-    if any(hint in q for hint in STRUCTURAL_HINTS):
-        return "route_query"
     # Route-first default (W1.1): auto intent tries agentic_router before vector.
     return "route_query"
 
@@ -211,6 +208,17 @@ def answer_learning_kb(
     elif surface == "route_query":
         try:
             result = route_query(q, k=k, max_retries=max_retries)
+            if result.get("retrieval_status") == "indeterminate":
+                degradation = "route_query_degraded_fallback"
+                tool_used = "query_all"
+                cause = (
+                    result.get("graph_facts_error")
+                    or "retrieval_status=indeterminate (no usable evidence)"
+                )
+                result = query_all(q, k=k)
+                route_errors = dict(result.get("errors") or {})
+                route_errors["route_query"] = cause
+                result = {**result, "errors": route_errors}
         except Exception as exc:
             degradation = "route_query_fallback"
             tool_used = "query_all"
