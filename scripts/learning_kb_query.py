@@ -32,6 +32,10 @@ def main(argv: list[str] | None = None) -> int:
         help="Explicit full-corpus vector mode (skips route-first default)",
     )
     parser.add_argument("--json", action="store_true", help="Emit answer_learning_kb JSON")
+    parser.add_argument(
+        "--caller-context",
+        help="Caller context as JSON/base64url JSON or @file; defaults to SM_CALLER_* env",
+    )
     parser.add_argument("-k", type=int, default=8, help="Retrieval depth (1-12)")
     args = parser.parse_args(argv)
 
@@ -40,6 +44,7 @@ def main(argv: list[str] | None = None) -> int:
         parser.error("question is required")
 
     context.set_client("local")
+    context.set_caller_context(context.load_caller_context_arg(args.caller_context))
     intent = "broad" if args.broad else "auto"
     result = answer_learning_kb(question=question, intent=intent, k=args.k)
 

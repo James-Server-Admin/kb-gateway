@@ -112,6 +112,22 @@ Route borderline runs to `kb-gateway-review` via LangSmith online eval rule or m
 
 Never contains bearer tokens or full question text.
 
+### Caller identity join
+
+Gateway callers may attach a safe caller context through `SM_CALLER_*` env, the
+CLI `--caller-context` option, or the `X-KB-Caller-Context` header. The gateway
+adds optional fields to audit rows and LangSmith metadata:
+
+```json
+{"caller_team":"kb-usage","caller_seat":"WKR-kb-usage-executor","caller_role":"executor","caller_gate":"B5","caller_trace_id":"tr-20260827-B5","caller_identity_status":"known"}
+```
+
+Primary join: `audit.caller_trace_id == session_manager.trace_spans.trace_id`.
+Secondary join: `(caller_team, caller_seat, caller_role, caller_gate, ts window)`.
+Legacy rows without context remain valid and carry
+`caller_identity_status="unknown"`. The `client` field remains the bearer-token
+auth label; it is not overloaded with team or seat identity.
+
 ## 5. Automation & cron (Phase 6 W16)
 
 ### Scripts

@@ -12,18 +12,19 @@ from langsmith.run_helpers import tracing_context
 
 from . import audit
 from .config import observability_environment, observability_surface
-from .context import get_client, get_tool, set_tool
+from .context import get_caller_context, get_client, get_tool, set_tool
 
 F = TypeVar("F", bound=Callable[..., Any])
 
 
-def trace_metadata() -> dict[str, str]:
+def trace_metadata() -> dict[str, Any]:
     return {
         "surface": observability_surface(),
         "environment": observability_environment(),
         "client": get_client(),
         "tool": get_tool(),
         "service": "kb-gateway",
+        **get_caller_context(),
     }
 
 
@@ -79,6 +80,7 @@ def instrument_tool(tool_name: str) -> Callable[[F], F]:
                     question=question,
                     route=route,
                     error=err,
+                    extra=get_caller_context(),
                 )
 
         return wrapper  # type: ignore[return-value]
