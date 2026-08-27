@@ -15,7 +15,7 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 
 from access import provision, store
 from kb_gateway.config import api_tokens, token_client_map
-from kb_gateway.context import set_client
+from kb_gateway.context import parse_caller_context_payload, set_caller_context, set_client
 
 app = FastAPI(title="KB Access Portal", version="1.0.0")
 
@@ -135,6 +135,7 @@ def query_page() -> HTMLResponse:
 
 @app.post("/query", response_class=HTMLResponse)
 def submit_query(
+    request: Request,
     token: str = Form(...),
     question: str = Form(...),
     intent: str = Form("auto"),
@@ -143,6 +144,9 @@ def submit_query(
     if client is None:
         raise HTTPException(403, "Invalid token")
     set_client(client)
+    set_caller_context(
+        parse_caller_context_payload(request.headers.get("X-KB-Caller-Context"))
+    )
     try:
         from kb_gateway import tools
 
