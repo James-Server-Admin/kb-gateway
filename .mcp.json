@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "kb-gateway": {
+      "type": "http",
+      "url": "https://kb-mcp.waytie.com/mcp",
+      "headers": {
+        "Authorization": "Bearer ${KB_GATEWAY_API_TOKEN}"
+      }
+    }
+  }
+}
