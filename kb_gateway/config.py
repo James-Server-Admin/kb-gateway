@@ -45,6 +45,7 @@ _PENDING_OWNER_TIER = (
 # PR.
 EXCLUDED_NAMESPACES: dict[str, str] = {
     "course-code": "24 vectors of repo scripts/notebooks — low value via MCP",
+    "session-compactions": "compaction RECORDs from the estate compaction sink (canon#814/#815) — private episodic layer, James-lane only; never collaborator-safe",
     "own-notes": "personal operator notes (18 vectors) — not collaborator-safe",
     "orchestrations": _PENDING_OWNER_TIER,
     "pinecone-platform": _PENDING_OWNER_TIER,
