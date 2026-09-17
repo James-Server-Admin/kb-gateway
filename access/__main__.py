@@ -6,7 +6,7 @@ import sys
 import uvicorn
 
 if __name__ == "__main__":
-    sys.path.insert(0, "/mnt/blockstorage/env")
+    sys.path.insert(0, "/srv/org/env")
     from load_credentials import load_kb_access
 
     load_kb_access()

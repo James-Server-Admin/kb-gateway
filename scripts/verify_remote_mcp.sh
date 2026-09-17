@@ -3,7 +3,7 @@
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
-source /mnt/blockstorage/env/load.sh kb-gateway 2>/dev/null || source /mnt/blockstorage/env/load.sh global 2>/dev/null || true
+source /srv/org/env/load.sh kb-gateway 2>/dev/null || source /srv/org/env/load.sh global 2>/dev/null || true
 
 BASE="${KB_GATEWAY_PUBLIC_URL:-https://kb-mcp.waytie.com}"
 BASE="${BASE%/}"

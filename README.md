@@ -51,7 +51,7 @@ For new agents, call `answer_learning_kb` first. Use `intent="broad"` for full-c
 ## Quick start (server operator)
 
 ```bash
-source /mnt/blockstorage/env/load.sh kb-gateway
+source /srv/org/env/load.sh kb-gateway
 /root/.venv-langchain-course/bin/python -m kb_gateway --transport streamable-http
 # binds 127.0.0.1:8790 — public via kb-mcp.waytie.com nginx
 ```
