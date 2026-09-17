@@ -8,8 +8,8 @@ PROJECT="${LANGSMITH_PROJECT:-LANGCHAIN-APP}"
 ACCOUNT="${LANGSMITH_ACCOUNT:-learning}"
 
 cd "$TEMPLATE_ROOT"
-source /mnt/blockstorage/env/load.sh global 2>/dev/null || true
-[[ "$ACCOUNT" == "keyflo" ]] && source /mnt/blockstorage/env/load.sh keyflo 2>/dev/null || true
+source /srv/org/env/load.sh global 2>/dev/null || true
+[[ "$ACCOUNT" == "keyflo" ]] && source /srv/org/env/load.sh keyflo 2>/dev/null || true
 
 echo "Applying correctness-mcp-surface → $PROJECT (account=$ACCOUNT)"
 python3 scripts/apply_rule.py apply correctness-mcp-surface \

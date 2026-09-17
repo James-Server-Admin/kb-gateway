@@ -9,7 +9,7 @@ REPOS=(
   "okrealai/kb-gateway"
 )
 
-source /mnt/blockstorage/env/load.sh kb-gateway 2>/dev/null || true
+source /srv/org/env/load.sh kb-gateway 2>/dev/null || true
 BASE="${KB_GATEWAY_PUBLIC_URL:-https://kb-mcp.waytie.com}"
 BASE="${BASE%/}"
 URL="${KB_GATEWAY_MCP_URL:-${BASE}/mcp}"

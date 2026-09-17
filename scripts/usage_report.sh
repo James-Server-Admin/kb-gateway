@@ -3,7 +3,7 @@
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
-source /mnt/blockstorage/env/load.sh global 2>/dev/null || true
+source /srv/org/env/load.sh global 2>/dev/null || true
 
 DAYS="${1:-7}"
 AUDIT="${KB_GATEWAY_AUDIT_LOG:-logs/audit.jsonl}"

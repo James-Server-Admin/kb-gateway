@@ -1,6 +1,6 @@
 # Infrastructure — kb-gateway
 
-Credentials via `/mnt/blockstorage/env/load.sh global` — **no values in this repo**.
+Credentials via `/srv/org/env/load.sh global` — **no values in this repo**.
 
 | Resource | Location | Notes |
 |---|---|---|

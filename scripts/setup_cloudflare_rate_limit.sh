@@ -3,7 +3,7 @@
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
-source /mnt/blockstorage/env/load.sh keyflo 2>/dev/null || true
+source /srv/org/env/load.sh keyflo 2>/dev/null || true
 
 PY="${PY:-/root/.venv-langchain-course/bin/python}"
 WAF_TOKEN_PATH="/mnt/blockstorage/private/credentials/keyflo-cloudflare-waf-api-token.txt"

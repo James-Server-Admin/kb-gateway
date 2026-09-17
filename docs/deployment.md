@@ -27,7 +27,7 @@ sudo systemctl daemon-reload
 sudo systemctl enable --now kb-gateway
 ```
 
-Service runs as root with `EnvironmentFile=/mnt/blockstorage/env/global.env` plus token file.
+Service runs as root with `EnvironmentFile=/srv/org/env/global.env` plus token file.
 
 ## 2. Secrets
 
@@ -35,7 +35,7 @@ Register via NEW-SECRET-INTAKE:
 
 | Secret | Scope | Consumer |
 |---|---|---|
-| `KB_GATEWAY_API_TOKEN` | `/mnt/blockstorage/env/kb-gateway.env` | Remote MCP clients (systemd only) |
+| `KB_GATEWAY_API_TOKEN` | `/srv/org/env/kb-gateway.env` | Remote MCP clients (systemd only) |
 | Existing `LEARNING_*` | global.env | Server runtime only |
 
 Never give remote agents Pinecone or Neo4j credentials — they use MCP tools only.

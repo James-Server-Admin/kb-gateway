@@ -17,13 +17,13 @@ HTTP MCP gateway exposing the **James learning KB** (Pinecone + Neo4j + agentic 
 
 - Business: Keyflo → `/mnt/blockstorage/business/Keyflo_AI/CLAUDE.md`
 - Runtime deps: `/root/langchain-course` (okrealai/langchain-course)
-- Env: `source /mnt/blockstorage/env/load.sh global`
+- Env: `source /srv/org/env/load.sh global`
 
 ## Run (operator)
 
 ```bash
 cd /mnt/blockstorage/business/Keyflo_AI/08_Development/kb-gateway
-source /mnt/blockstorage/env/load.sh global
+source /srv/org/env/load.sh global
 export KB_GATEWAY_API_TOKEN="<from secrets registry>"
 /root/.venv-langchain-course/bin/python -m kb_gateway --transport streamable-http
 ```
