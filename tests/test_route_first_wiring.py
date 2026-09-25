@@ -38,8 +38,13 @@ _QUERY_ALL_OK = {
 }
 
 
-def test_excluded_namespaces_count_is_ten():
-    assert len(EXCLUDED_NAMESPACES) == 10
+def test_every_excluded_namespace_carries_a_reason():
+    # Was `len(EXCLUDED_NAMESPACES) == 10`: a hard count broke at the 11th exclusion (session-compactions) and again
+    # at borrow-verdicts. Partition parity with kb-core lives in test_namespace_whitelist.py; this guards the reasons.
+    assert EXCLUDED_NAMESPACES
+    for name, why in EXCLUDED_NAMESPACES.items():
+        assert name and isinstance(why, str) and len(why.strip()) >= 20, name
+    assert "borrow-verdicts" in EXCLUDED_NAMESPACES
 
 
 def test_pick_surface_auto_course_domain_uses_route_query():
