@@ -55,6 +55,7 @@ EXCLUDED_NAMESPACES: dict[str, str] = {
     "neo4j-platform": "platform template — queryable via neo4j-platform-bootstrap",
     "pinecone-platform-smoke": "W18 smoke-test artifacts — verification residue, not knowledge",
     "keyflo-copy-eval-feedback": "Keyflo product-eval feedback store — not learning KB content",
+    "borrow-verdicts": "borrow-scan verdict records (James-Server-Admin/srv#718) — an on-box tool cache read by borrow-scan and pinecone-context; not course knowledge",
 }
 
 
